@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/machinebox/graphql"
 )
 
 type User struct {
@@ -20,37 +17,6 @@ var usersDB = map[string]string{
 	"testuser": "password123",
 }
 
-type HasuraClient struct {
-	client *graphql.Client
-}
-
-// NewHasuraClient creates a new Hasura GraphQL client.
-func NewHasuraClient(endpoint string) *HasuraClient {
-	return &HasuraClient{
-		client: graphql.NewClient(endpoint),
-	}
-}
-
-// InsertUser inserts a new user into the Hasura database.
-func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
-	req := graphql.NewRequest(`
-		mutation($username: String!, $password: String!) {
-			insert_users_one(object: {username: $username, password: $password}) {
-				id
-			}
-		}
-	`)
-	req.Var("username", username)
-	req.Var("password", password)
-
-	var resp map[string]interface{}
-	err := h.client.Run(ctx, req, &resp)
-	if err != nil {
-		return fmt.Errorf("error inserting user: %v", err)
-	}
-
-	return nil
-}
 
 // Signup endpoint
 func Signup(w http.ResponseWriter, r *http.Request) {
@@ -69,11 +35,10 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usersDB[user.Username] = user.Password
-
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created successfully"))
 }
+
 
 // Login endpoint
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -84,20 +49,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check user credentials
 	storedPassword, exists := usersDB[user.Username]
 	if !exists || storedPassword != user.Password {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	token, err := GenerateJWT(user.Username)
-	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
-		return
-	}
-
-	// Send response
+	token := "dummyJWT" // Replace with actual JWT generation logic
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }

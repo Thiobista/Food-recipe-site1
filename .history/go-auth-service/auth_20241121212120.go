@@ -35,4 +35,3 @@ func ValidateJWT(tokenStr string) (*jwt.Token, error) {
 	})
 	return token, err
 }
-

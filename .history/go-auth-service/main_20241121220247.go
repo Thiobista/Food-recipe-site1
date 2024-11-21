@@ -26,27 +26,54 @@ type HasuraClient struct {
 
 // NewHasuraClient creates a new Hasura GraphQL client.
 func NewHasuraClient(endpoint string) *HasuraClient {
-	return &HasuraClient{
-		client: graphql.NewClient(endpoint),
-	}
+	return &HasuraClient{endpoint: endpoint}
 }
 
-// InsertUser inserts a new user into the Hasura database.
 func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
-	req := graphql.NewRequest(`
+	query := `
 		mutation($username: String!, $password: String!) {
 			insert_users_one(object: {username: $username, password: $password}) {
 				id
 			}
 		}
-	`)
-	req.Var("username", username)
-	req.Var("password", password)
+	`
 
-	var resp map[string]interface{}
-	err := h.client.Run(ctx, req, &resp)
+	variables := map[string]interface{}{
+		"username": username,
+		"password": password,
+	}
+
+	payload := map[string]interface{}{
+		"query":     query,
+		"variables": variables,
+	}
+
+	data, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("error inserting user: %v", err)
+		return fmt.Errorf("failed to encode payload: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", h.endpoint, bytes.NewBuffer(data))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-hasura-admin-secret", "your_admin_secret") // Replace with your Hasura admin secret
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return nil
@@ -68,8 +95,6 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error inserting user to Hasura: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	usersDB[user.Username] = user.Password
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created successfully"))

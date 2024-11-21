@@ -26,8 +26,7 @@ type HasuraClient struct {
 
 // NewHasuraClient creates a new Hasura GraphQL client.
 func NewHasuraClient(endpoint string) *HasuraClient {
-	return &HasuraClient{
-		client: graphql.NewClient(endpoint),
+	return &HasuraClient{endpoint: endpoint
 	}
 }
 

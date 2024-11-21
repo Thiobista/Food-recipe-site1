@@ -35,4 +35,26 @@ func ValidateJWT(tokenStr string) (*jwt.Token, error) {
 	})
 	return token, err
 }
+func JWTMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" || len(authHeader) < 8 {
+			http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+			return
+		}
+
+		// Extract the token
+		tokenStr := authHeader[len("Bearer "):]
+
+		// Validate the token
+		token, err := ValidateJWT(tokenStr)
+		if err != nil || !token.Valid {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		// Proceed with the request
+		next.ServeHTTP(w, r)
+	})
+}
 

@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/machinebox/graphql"
 )
 
 type User struct {
@@ -20,36 +17,27 @@ var usersDB = map[string]string{
 	"testuser": "password123",
 }
 
-type HasuraClient struct {
-	client *graphql.Client
-}
-
-// NewHasuraClient creates a new Hasura GraphQL client.
-func NewHasuraClient(endpoint string) *HasuraClient {
-	return &HasuraClient{
-		client: graphql.NewClient(endpoint),
-	}
-}
-
-// InsertUser inserts a new user into the Hasura database.
-func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
-	req := graphql.NewRequest(`
-		mutation($username: String!, $password: String!) {
-			insert_users_one(object: {username: $username, password: $password}) {
-				id
-			}
+func JWTMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" || len(authHeader) < 8 {
+			http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+			return
 		}
-	`)
-	req.Var("username", username)
-	req.Var("password", password)
 
-	var resp map[string]interface{}
-	err := h.client.Run(ctx, req, &resp)
-	if err != nil {
-		return fmt.Errorf("error inserting user: %v", err)
-	}
+		// Extract the token
+		tokenStr := authHeader[len("Bearer "):]
 
-	return nil
+		// Validate the token
+		token, err := ValidateJWT(tokenStr)
+		if err != nil || !token.Valid {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		// Proceed with the request
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Signup endpoint
@@ -60,15 +48,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-
-	hasuraClient := NewHasuraClient("http://localhost:8080/v1/graphql")
+hasuraClient := NewHasuraClient("http://localhost:8080/v1/graphql")
 
 	err = hasuraClient.InsertUser(context.Background(), user.Username, user.Password)
 	if err != nil {
 		http.Error(w, "Error inserting user to Hasura: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	usersDB[user.Username] = user.Password
 
 	w.WriteHeader(http.StatusCreated)
@@ -84,13 +70,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check user credentials
 	storedPassword, exists := usersDB[user.Username]
 	if !exists || storedPassword != user.Password {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
+	// Generate JWT
 	token, err := GenerateJWT(user.Username)
 	if err != nil {
 		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
@@ -113,6 +99,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Server is running!"))
 }
+
 
 func main() {
 	r := mux.NewRouter()
