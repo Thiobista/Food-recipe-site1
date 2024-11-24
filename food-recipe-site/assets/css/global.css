@@ -1,0 +1,13 @@
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    background-color: #f9fafb;
+  }
+  a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  
