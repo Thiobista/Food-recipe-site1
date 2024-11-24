@@ -1,7 +1,12 @@
 <template>
   <div>
+    <!-- Success Message -->
+    <div v-if="showSuccessMessage" class="fixed top-4 right-4 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+      <p>{{ message }}</p>
+    </div>
+
     <!-- My Recipes Page Heading -->
-    <h2 class="text-3xl font-bold mb-6">My Recipes</h2>
+    <h2 class="text-3xl font-bold mb-6 text-center">My Recipes</h2>
 
     <!-- No Recipes Message -->
     <div v-if="recipes.length === 0" class="text-center text-gray-500">
@@ -25,7 +30,7 @@
             Edit
           </button>
           <button
-            @click="confirmDeleteRecipe(recipe.id)"
+            @click="openDeleteModal(recipe.id)"
             class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
           >
             Delete
@@ -49,20 +54,44 @@
         Add New Recipe
       </button>
     </div>
+
+    <!-- Delete Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+        <h3 class="text-lg font-semibold mb-4">Are you sure you want to delete this recipe?</h3>
+        <div class="flex justify-between">
+          <button @click="deleteRecipe" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition">
+            Yes, Delete
+          </button>
+          <button @click="closeDeleteModal" class="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Use the Nuxt router instance
 const router = useRouter();
 
 // Example recipe data (replace with actual fetch or state management)
-const recipes = [
-  { id: 1, title: 'Chocolate Cake', description: 'A delicious chocolate cake recipe.', image: '/images/chocolate-cake.jpg' },
-  { id: 2, title: 'Apple Pie', description: 'A traditional apple pie recipe.', image: '/images/apple-pie.jpg' },
-];
+const recipes = ref([
+  { id: 1, title: 'Chocolate Cake', description: 'A delicious chocolate cake recipe.', image: '/images/chocolate.jpg' },
+  { id: 2, title: 'Apple Pie', description: 'A traditional apple pie recipe.', image: '/images/apple.jpg' },
+]);
+
+// Delete modal visibility and selected recipe ID
+const showDeleteModal = ref(false);
+const recipeToDelete = ref(null);
+
+// Success message visibility and content
+const showSuccessMessage = ref(false);
+const message = ref('');
 
 // Navigation to Add New Recipe Page
 const goToAddRecipe = () => {
@@ -74,22 +103,32 @@ const editRecipe = (recipeId) => {
   router.push(`/recipes/edit/${recipeId}`);
 };
 
-// Confirm and delete recipe
-const confirmDeleteRecipe = (recipeId) => {
-  if (confirm('Are you sure you want to delete this recipe?')) {
-    deleteRecipe(recipeId);
-  }
+// Open delete confirmation modal
+const openDeleteModal = (recipeId) => {
+  recipeToDelete.value = recipeId;
+  showDeleteModal.value = true;
 };
 
-// Remove recipe from list
-const deleteRecipe = (recipeId) => {
-  const index = recipes.findIndex((recipe) => recipe.id === recipeId);
+// Close delete confirmation modal
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  recipeToDelete.value = null;
+};
 
-  if (index !== -1) {
-    recipes.splice(index, 1);
-    alert('Recipe deleted successfully'); // You can replace this with a toast notification
-  } else {
-    alert('Recipe not found');
+// Confirm and delete recipe
+const deleteRecipe = () => {
+  if (recipeToDelete.value !== null) {
+    const index = recipes.value.findIndex((recipe) => recipe.id === recipeToDelete.value);
+    if (index !== -1) {
+      recipes.value.splice(index, 1); // Remove the recipe from the list
+      closeDeleteModal(); // Close the modal after deletion
+      // Show success message
+      message.value = 'Recipe deleted successfully';
+      showSuccessMessage.value = true;
+      setTimeout(() => { showSuccessMessage.value = false; }, 3000); // Hide after 3 seconds
+    } else {
+      alert('Recipe not found');
+    }
   }
 };
 
@@ -105,7 +144,11 @@ const shareRecipe = (recipe) => {
 
   if (navigator.share) {
     navigator.share(shareData)
-      .then(() => alert('Recipe shared successfully')) // Replace with toast notifications
+      .then(() => {
+        message.value = 'Recipe shared successfully';
+        showSuccessMessage.value = true;
+        setTimeout(() => { showSuccessMessage.value = false; }, 3000);
+      })
       .catch((error) => console.error('Error sharing:', error));
   } else {
     const shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
@@ -132,5 +175,30 @@ button {
 }
 .recipe-card h3 {
   margin-top: 1rem;
+}
+
+/* Modal Styles */
+.fixed {
+  position: fixed;
+}
+.bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.bg-white {
+  background-color: #ffffff;
+}
+.p-6 {
+  padding: 1.5rem;
+}
+.rounded-lg {
+  border-radius: 8px;
+}
+.shadow-xl {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Success message styles */
+.fixed.top-4.right-4 {
+  z-index: 1000;
 }
 </style>

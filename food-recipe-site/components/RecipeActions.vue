@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="flex space-x-6 mt-4">
       <button class="text-yellow-500 hover:text-yellow-600">
         <i class="fas fa-heart"></i> Like
@@ -11,4 +11,4 @@
       </button>
     </div>
   </template>
-  
+   -->

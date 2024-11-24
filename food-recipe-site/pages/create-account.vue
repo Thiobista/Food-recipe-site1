@@ -1,7 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-r from-teal-400 to-blue-500 flex items-center justify-center">
-    <!-- Card Container -->
-    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-xl transform transition-all duration-500 hover:scale-105">
+  <div class="relative min-h-screen bg-cover bg-center flex items-center justify-center">
+    <!-- Blurred Background Layer -->
+    <div 
+      class="absolute inset-0 bg-cover bg-center blur-sm" 
+      style="background-image: url('images/chief.jpg');"
+    ></div>
+
+    <!-- Content Layer -->
+    <div class="relative w-full max-w-md bg-white p-8 rounded-lg shadow-xl transform transition-all duration-500 hover:scale-105">
       <!-- Title -->
       <h1 class="text-4xl font-semibold text-center text-gray-800 mb-6">Create Your Account</h1>
       
@@ -76,49 +82,32 @@
 </template>
 
 <script setup>
-// Reactive variables for form data
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'; // Import useRouter for navigation
+import { useRouter } from 'vue-router';
 
+const router = useRouter(); // Initialize router
 const fullName = ref('');
 const email = ref('');
 const password = ref('');
 const errors = ref({});
 
-// Function to handle form submission
 const submitForm = () => {
-  // Reset errors
   errors.value = {};
+  if (!fullName.value) errors.value.fullName = 'Full name is required';
+  if (!email.value) errors.value.email = 'Email is required';
+  else if (!/\S+@\S+\.\S+/.test(email.value)) errors.value.email = 'Email is invalid';
+  if (!password.value) errors.value.password = 'Password is required';
 
-  // Validate form
-  if (!fullName.value) {
-    errors.value.fullName = 'Full name is required';
-  }
-  if (!email.value) {
-    errors.value.email = 'Email is required';
-  } else if (!/\S+@\S+\.\S+/.test(email.value)) {
-    errors.value.email = 'Email is invalid';
-  }
-  if (!password.value) {
-    errors.value.password = 'Password is required';
-  }
-
-  // If no errors, emit initials and navigate
   if (Object.keys(errors.value).length === 0) {
-    const initials = fullName.value.split(' ').map(word => word[0].toUpperCase()).join('');
-    
-    const router = useRouter();
     router.push('/'); // Navigate to home page
   }
 };
 
-// Function to handle "Continue Without Account" navigation
 const continueWithoutAccount = () => {
-  const router = useRouter();
   router.push('/'); // Navigate to home page
 };
 </script>
 
 <style scoped>
-/* You can customize the styles if needed */
+/* Scoped styles, if necessary */
 </style>

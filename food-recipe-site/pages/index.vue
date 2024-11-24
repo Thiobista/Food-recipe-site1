@@ -33,7 +33,7 @@
                 @click="goToPage('/profile')"
                 class="p-3 hover:bg-yellow-100 flex items-center space-x-3 cursor-pointer"
               >
-                <img src="/images/salad.jpg" alt="Profile" class="w-8 h-8 rounded-full border-2 border-yellow-500" />
+                <img src="/images/profile.jpg" alt="Profile" class="w-8 h-8 rounded-full border-2 border-yellow-500" />
                 <span>Profile</span>
               </li>
               <li
@@ -153,10 +153,12 @@ const bookmarkRecipe = (recipe) => {
   if (!exists) {
     bookmarkedRecipes.value.push(recipe);
     console.log('Recipe added to bookmarks!');
+    router.push('/bookmarks');  // Navigate to bookmarks page
   } else {
     console.log('Recipe is already bookmarked.');
   }
 };
+
 
 const goToPaymentPage = () => {
   router.push('/payment');

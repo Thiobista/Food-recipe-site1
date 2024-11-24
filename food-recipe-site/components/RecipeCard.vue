@@ -23,7 +23,7 @@
 
           <!-- Bookmark Button -->
           <button @click="bookmarkRecipe" class="text-blue-500 hover:text-blue-600 transition-colors duration-300 text-lg">
-            🔖 Bookmark
+            🔖 {{ isBookmarked ? 'Bookmarked' : 'Bookmark' }}
           </button>
 
           <!-- Comment Button -->
@@ -102,6 +102,11 @@
         </div>
       </div>
     </div>
+
+    <!-- Notification -->
+    <div v-if="notification" class="fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg z-40 transition-all">
+      {{ notification }}
+    </div>
   </div>
 </template>
 
@@ -115,6 +120,7 @@ const props = defineProps({
   recipeId: String,
 });
 
+const isBookmarked = ref(false); // Reactive state for bookmark
 const isBuying = ref(false);
 const showComments = ref(false);
 const showModal = ref(false);
@@ -124,6 +130,7 @@ const currentRating = ref(0);
 const hoverRating = ref(0);   
 const showRatingPopup = ref(false);
 const loadingMore = ref(false);
+const notification = ref('');
 
 const openRatingPopup = () => showRatingPopup.value = true;
 const cancelRating = () => showRatingPopup.value = false;
@@ -131,10 +138,6 @@ const confirmRating = () => showRatingPopup.value = false;
 
 const setRating = (star) => {
   currentRating.value = star;
-};
-
-const bookmarkRecipe = () => {
-  console.log("Recipe added to bookmarks!");
 };
 
 const showCommentFormModal = () => {
@@ -145,6 +148,9 @@ const closeModal = () => {
   showModal.value = false;
 };
 
+const bookmarkRecipe = () => {
+  isBookmarked.value = !isBookmarked.value; // Toggle bookmark state
+};
 const loadComments = () => {
   const newComments = [
     { text: "Great recipe!" },
@@ -187,7 +193,11 @@ const buyRecipe = () => {
 };
 
 const proceedToPayment = () => {
-  alert("Proceeding to payment with Chapa!");
+  notification.value = "Redirecting to Chapa for payment...";
+  setTimeout(() => {
+    notification.value = '';
+    closePaymentModal();
+  }, 3000);
 };
 
 const closePaymentModal = () => {
@@ -197,26 +207,9 @@ const closePaymentModal = () => {
 onMounted(() => {
   loadComments();
 });
+
 </script>
 
 <style scoped>
-/* Enhanced hover effects */
-.bg-white {
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-}
-
-.bg-white:hover {
-  transform: scale(1.05) rotate(0.05deg); /* Slight rotation with scaling */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Deeper shadow effect */
-  background-color: rgba(255, 248, 240, 0.95); /* Subtle background color change */
-}
-
-.bg-white:hover h3 {
-  color: #f0baa5; /* Change title color on hover */
-}
-
-.bg-white:hover img {
-  filter: brightness(1.1); /* Slight brightness increase for the image */
-}
+/* Add custom styling as needed */
 </style>
-
