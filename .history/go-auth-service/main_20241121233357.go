@@ -10,7 +10,6 @@ import (
 "os"
 	"github.com/gorilla/mux"
 	"github.com/machinebox/graphql"
-	"crypto/sha256"
 )
 
 type User struct {
@@ -25,16 +24,7 @@ var usersDB = map[string]string{
 type HasuraClient struct {
 	client *graphql.Client
 }
-type SignupInput struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
 
-type SignupResponse struct {
-	Message string `json:"message"`
-	UserID  int    `json:"userId"`
-}
 // NewHasuraClient creates a new Hasura GraphQL client.
 func NewHasuraClient(endpoint string) *HasuraClient {
 	return &HasuraClient{
@@ -64,36 +54,26 @@ func (h *HasuraClient) InsertUser(ctx context.Context, username, password string
 }
 
 // Signup endpoint
-func SignupHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Input SignupInput `json:"input"`
-	}
-
-	// Parse the request body
-	err := json.NewDecoder(r.Body).Decode(&input)
+func Signup(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	// Hash the password
-	passwordHash := fmt.Sprintf("%x", sha256.Sum256([]byte(input.Input.Password)))
+	hasuraClient := NewHasuraClient("http://localhost:8080/v1/graphql")
 
-	// Insert user into the database (mocked example)
-	// Replace this mock with actual database interaction
-	fmt.Printf("Storing user: Username=%s, Email=%s, PasswordHash=%s\n", 
-		input.Input.Username, input.Input.Email, passwordHash)
-
-	// Example User ID after successful insertion
-	userID := 1 
-
-	// Return success response
-	response := SignupResponse{
-		Message: "Signup successful!",
-		UserID:  userID,
+	err = hasuraClient.InsertUser(context.Background(), user.Username, user.Password)
+	if err != nil {
+		http.Error(w, "Error inserting user to Hasura: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+
+	usersDB[user.Username] = user.Password
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("User created successfully"))
 }
 
 // Login endpoint
@@ -165,7 +145,7 @@ func uploadImageHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", Home).Methods("GET")
-	//r.HandleFunc("/signup", Signup).Methods("POST")
+	r.HandleFunc("/signup", Signup).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/protected-route", ProtectedRoute).Methods("GET")
 	http.HandleFunc("/upload", uploadImageHandler)

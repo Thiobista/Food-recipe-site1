@@ -66,7 +66,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="relative bg-cover bg-center h-[60vh] rounded-lg overflow-hidden mt-16" style="background-image: url('/path/to/hero-image.jpg');">
+    <section class="relative bg-cover bg-center h-[60vh] rounded-lg overflow-hidden mt-16" style="background-image: url('/images/salad.jpg');">
       <div class="absolute inset-0 bg-black opacity-60"></div>
       <div class="relative z-10 text-center text-white py-24 px-6">
         <h1 class="text-4xl font-extrabold mb-4 leading-tight">Welcome to Delicious Recipes</h1>
@@ -184,7 +184,7 @@ li img {
 
 /* Hero Section styling */
 .hero-section {
-  background: url('/path/to/hero-image.jpg') center/cover no-repeat;
+  background: url('/images/salad.jpg') center/cover no-repeat;
   height: 60vh;
   position: relative;
 }
