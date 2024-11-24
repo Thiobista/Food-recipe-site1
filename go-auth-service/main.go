@@ -1,15 +1,15 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-"io"
-"os"
+	"io"
+	"os"
 	"github.com/gorilla/mux"
-	"github.com/machinebox/graphql"
+	// "github.com/machinebox/graphql"
 	"crypto/sha256"
 )
 
@@ -22,9 +22,10 @@ var usersDB = map[string]string{
 	"testuser": "password123",
 }
 
-type HasuraClient struct {
-	client *graphql.Client
-}
+// type HasuraClient struct {
+// 	client *graphql.Client
+// }
+
 type SignupInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -35,35 +36,36 @@ type SignupResponse struct {
 	Message string `json:"message"`
 	UserID  int    `json:"userId"`
 }
+
 // NewHasuraClient creates a new Hasura GraphQL client.
-func NewHasuraClient(endpoint string) *HasuraClient {
-	return &HasuraClient{
-		client: graphql.NewClient(endpoint),
-	}
-}
+// func NewHasuraClient(endpoint string) *HasuraClient {
+// 	return &HasuraClient{
+// 		client: graphql.NewClient(endpoint),
+// 	}
+// }
 
 // InsertUser inserts a new user into the Hasura database.
-func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
-	req := graphql.NewRequest(`
-		mutation($username: String!, $password: String!) {
-			insert_users_one(object: {username: $username, password: $password}) {
-				id
-			}
-		}
-	`)
-	req.Var("username", username)
-	req.Var("password", password)
+// func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
+// 	req := graphql.NewRequest(`
+// 		mutation($username: String!, $password: String!) {
+// 			insert_users_one(object: {username: $username, password: $password}) {
+// 				id
+// 			}
+// 		}
+// 	`)
+// 	req.Var("username", username)
+// 	req.Var("password", password)
 
-	var resp map[string]interface{}
-	err := h.client.Run(ctx, req, &resp)
-	if err != nil {
-		return fmt.Errorf("error inserting user: %v", err)
-	}
+// 	var resp map[string]interface{}
+// 	err := h.client.Run(ctx, req, &resp)
+// 	if err != nil {
+// 		return fmt.Errorf("error inserting user: %v", err)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-// Signup endpoint
+// SignupHandler is the handler for the signup endpoint.
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Input SignupInput `json:"input"`
@@ -96,7 +98,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// Login endpoint
+// Login is the login handler endpoint.
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -123,21 +125,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }
 
-// ProtectedRoute endpoint
+// ProtectedRoute is the endpoint for accessing a protected route.
 func ProtectedRoute(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Welcome to the protected route!"))
 }
 
-// Default home handler
+// Home is the default home handler.
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Server is running!"))
 }
+
 type UploadResponse struct {
     URL string `json:"url"`
 }
 
+// uploadImageHandler handles image upload.
 func uploadImageHandler(w http.ResponseWriter, r *http.Request) {
     file, header, err := r.FormFile("image")
     if err != nil {
@@ -165,9 +169,12 @@ func uploadImageHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", Home).Methods("GET")
-	//r.HandleFunc("/signup", Signup).Methods("POST")
+	r.HandleFunc("/signup", SignupHandler).Methods("POST") // Updated this handler
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/protected-route", ProtectedRoute).Methods("GET")
 	http.HandleFunc("/upload", uploadImageHandler)
+	r.HandleFunc("/signup", SignupHandler).Methods("POST")
+
+
 	log.Fatal(http.ListenAndServe(":8081", r))
 }
