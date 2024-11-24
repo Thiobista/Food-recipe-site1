@@ -61,6 +61,16 @@
           </div>
         </div>
       </form>
+
+      <!-- Continue Without Account Button -->
+      <div class="mt-4 text-center">
+        <button
+          @click="continueWithoutAccount"
+          class="text-teal-500 underline hover:text-teal-700 transition duration-200"
+        >
+          Continue Without Account
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -68,6 +78,7 @@
 <script setup>
 // Reactive variables for form data
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'; // Import useRouter for navigation
 
 const fullName = ref('');
 const email = ref('');
@@ -96,13 +107,15 @@ const submitForm = () => {
   if (Object.keys(errors.value).length === 0) {
     const initials = fullName.value.split(' ').map(word => word[0].toUpperCase()).join('');
     
-    // You can emit to a parent component or handle routing
-    // Example: use a store or navigate to another page
-
-    // Use Nuxt's useRouter() to redirect to the homepage
     const router = useRouter();
-    router.push('/');
+    router.push('/'); // Navigate to home page
   }
+};
+
+// Function to handle "Continue Without Account" navigation
+const continueWithoutAccount = () => {
+  const router = useRouter();
+  router.push('/'); // Navigate to home page
 };
 </script>
 

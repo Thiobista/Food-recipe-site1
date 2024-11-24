@@ -67,7 +67,7 @@
         <!-- Create Account Button (Top Right) -->
         <div class="ml-auto">
           <button
-            class="bg-yellow-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+            class="bg-yellow-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-yellow-600 transition duration-300"
             @click="createAccount"
           >
             Create Account
@@ -78,7 +78,7 @@
  <!-- Hero Section -->
  <section
       class="relative bg-cover bg-center h-[60vh] rounded-lg overflow-hidden mt-16"
-      style="background-image: url('/path/to/hero-image.jpg');"
+      style="background-image: url('/images/hero.jpg');"
     >
       <div class="absolute inset-0 bg-black opacity-60"></div>
       <div class="relative z-10 text-center text-white py-24 px-6">
@@ -86,8 +86,9 @@
         <p class="text-xl mb-6 font-light">Explore, Create, and Share your favorite recipes.</p>
         <button
           class="bg-yellow-500 text-white py-3 px-8 rounded-full text-lg shadow-lg hover:bg-yellow-600 transform hover:scale-105 transition duration-300 ease-in-out"
-        >
-          Start Cooking
+        @click="scrollToRecipes"
+          >
+          Start Cooking 
         </button>
       </div>
     </section>
@@ -100,7 +101,7 @@
         <RecipeCard
           v-for="n in 6"
           :key="n"
-          image="/images/sample.jpg"
+          image="/images/salad.jpg"
           title="Delicious Recipe"
           description="A quick preview of the recipe details."
           @rate="rateRecipe"
@@ -159,6 +160,12 @@ const bookmarkRecipe = (recipe) => {
 
 const goToPaymentPage = () => {
   router.push('/payment');
+};
+const scrollToRecipes = () => {
+  const recipesSection = document.querySelector('main');
+  if (recipesSection) {
+    recipesSection.scrollIntoView({ behavior: 'smooth' });
+  }
 };
 </script>
 
@@ -329,4 +336,5 @@ li img {
 li:hover img {
   transform: rotate(360deg); /* Rotate the profile image on hover */
 }
+
 </style>
