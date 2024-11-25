@@ -4,14 +4,14 @@
     <header>
       <nav class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 p-4 flex justify-between items-center shadow-xl rounded-b-lg fixed top-0 left-0 w-full z-20">
         <!-- Menu Button (Top Left) -->
-        <div>
+        <!-- <div>
           <button
             @click="toggleMenu"
             class="text-white font-semibold text-xl hover:text-gray-300 focus:outline-none"
           >
             ☰ Menu
           </button>
-        </div>
+        </div> -->
 
         <!-- Menu Contents -->
         <transition name="slide-fade">

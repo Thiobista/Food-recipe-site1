@@ -134,8 +134,8 @@ const submitForm = async () => {
       
       // Handle success
       console.log('Registration successful:', response.data);
-      alert('Signup successful! Redirecting to home ...');
-      router.push('/index'); // Navigate to the login page
+      // alert('Signup successful! Redirecting to home ...');
+      router.push('/authorized'); // Navigate to the login page
     } catch (error) {
       // Handle backend validation errors or server issues
       if (error.response) {
