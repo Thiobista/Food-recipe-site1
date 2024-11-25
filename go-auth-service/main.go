@@ -1,77 +1,40 @@
 package main
 
 import (
-	// "context"
+	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"io"
-	"os"
+
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	// "github.com/machinebox/graphql"
-	"crypto/sha256"
+	"github.com/machinebox/graphql"
 )
 
-type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-var usersDB = map[string]string{
-	"testuser": "password123",
-}
-
-// type HasuraClient struct {
-// 	client *graphql.Client
-// }
-
+// Struct for input from the request
 type SignupInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
+// Struct for response to the client
 type SignupResponse struct {
 	Message string `json:"message"`
-	UserID  int    `json:"userId"`
+	UserID  string `json:"userId"` // Changed from int to string
 }
 
-// NewHasuraClient creates a new Hasura GraphQL client.
-// func NewHasuraClient(endpoint string) *HasuraClient {
-// 	return &HasuraClient{
-// 		client: graphql.NewClient(endpoint),
-// 	}
-// }
+// Hasura GraphQL client configuration
+var hasuraEndpoint = "http://localhost:8080/v1/graphql" // Adjust to match your Hasura instance
+var hasuraAdminSecret = "myadminsecretkey"              // Replace with your Hasura admin secret (if set)
 
-// InsertUser inserts a new user into the Hasura database.
-// func (h *HasuraClient) InsertUser(ctx context.Context, username, password string) error {
-// 	req := graphql.NewRequest(`
-// 		mutation($username: String!, $password: String!) {
-// 			insert_users_one(object: {username: $username, password: $password}) {
-// 				id
-// 			}
-// 		}
-// 	`)
-// 	req.Var("username", username)
-// 	req.Var("password", password)
-
-// 	var resp map[string]interface{}
-// 	err := h.client.Run(ctx, req, &resp)
-// 	if err != nil {
-// 		return fmt.Errorf("error inserting user: %v", err)
-// 	}
-
-// 	return nil
-// }
-
-// SignupHandler is the handler for the signup endpoint.
+// SignupHandler for user signup
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Input SignupInput `json:"input"`
-	}
+	var input SignupInput
 
-	// Parse the request body
+	// Decode input JSON
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
@@ -79,102 +42,62 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Hash the password
-	passwordHash := fmt.Sprintf("%x", sha256.Sum256([]byte(input.Input.Password)))
+	passwordHash := fmt.Sprintf("%x", sha256.Sum256([]byte(input.Password)))
 
-	// Insert user into the database (mocked example)
-	// Replace this mock with actual database interaction
-	fmt.Printf("Storing user: Username=%s, Email=%s, PasswordHash=%s\n", 
-		input.Input.Username, input.Input.Email, passwordHash)
+	// Create a GraphQL client
+	client := graphql.NewClient(hasuraEndpoint)
 
-	// Example User ID after successful insertion
-	userID := 1 
+	// Set up the GraphQL mutation
+	req := graphql.NewRequest(`
+		mutation($username: String!, $email: String!, $password: String!) {
+			insert_users_one(object: {username: $username, email: $email, password: $password}) {
+				id
+			}
+		}
+	`)
 
-	// Return success response
+	// Set variables for the mutation
+	req.Var("username", input.Username)
+	req.Var("email", input.Email)
+	req.Var("password", passwordHash)
+
+	// Add Hasura admin secret header (if required)
+	req.Header.Set("x-hasura-admin-secret", hasuraAdminSecret)
+
+	// Execute the GraphQL request
+	var resp struct {
+		InsertUsersOne struct {
+			ID string `json:"id"` // Adjusted type to string
+		} `json:"insert_users_one"`
+	}
+
+	err = client.Run(context.Background(), req, &resp)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error inserting user: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with success
 	response := SignupResponse{
 		Message: "Signup successful!",
-		UserID:  userID,
+		UserID:  resp.InsertUsersOne.ID,
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-// Login is the login handler endpoint.
-func Login(w http.ResponseWriter, r *http.Request) {
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
-		return
-	}
-
-	// Check user credentials
-	storedPassword, exists := usersDB[user.Username]
-	if !exists || storedPassword != user.Password {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-		return
-	}
-
-	token, err := GenerateJWT(user.Username)
-	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
-		return
-	}
-
-	// Send response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": token})
-}
-
-// ProtectedRoute is the endpoint for accessing a protected route.
-func ProtectedRoute(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Welcome to the protected route!"))
-}
-
-// Home is the default home handler.
-func Home(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Server is running!"))
-}
-
-type UploadResponse struct {
-    URL string `json:"url"`
-}
-
-// uploadImageHandler handles image upload.
-func uploadImageHandler(w http.ResponseWriter, r *http.Request) {
-    file, header, err := r.FormFile("image")
-    if err != nil {
-        http.Error(w, "Failed to read file", http.StatusBadRequest)
-        return
-    }
-    defer file.Close()
-
-    // Save file locally
-    outFile, err := os.Create("./uploads/" + header.Filename)
-    if err != nil {
-        http.Error(w, "Failed to save file", http.StatusInternalServerError)
-        return
-    }
-    defer outFile.Close()
-    io.Copy(outFile, file)
-
-    response := UploadResponse{
-        URL: fmt.Sprintf("http://localhost:8080/uploads/%s", header.Filename),
-    }
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
-}
-
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", Home).Methods("GET")
-	r.HandleFunc("/signup", SignupHandler).Methods("POST") // Updated this handler
-	r.HandleFunc("/login", Login).Methods("POST")
-	r.HandleFunc("/protected-route", ProtectedRoute).Methods("GET")
-	http.HandleFunc("/upload", uploadImageHandler)
 	r.HandleFunc("/signup", SignupHandler).Methods("POST")
 
+	// CORS configuration
+	corsHandler := handlers.CORS(
+		handlers.AllowedOrigins([]string{"http://localhost:5173"}), // Adjust based on your front-end origin
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+	)
 
-	log.Fatal(http.ListenAndServe(":8081", r))
+	log.Println("Server is running on http://localhost:8081")
+	log.Fatal(http.ListenAndServe(":8081", corsHandler(r)))
 }

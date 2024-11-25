@@ -59,10 +59,11 @@
           <!-- Submit Button -->
           <div>
             <button
+              :disabled="loading"
               type="submit"
-              class="w-full bg-teal-500 text-white py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out hover:bg-teal-600"
+              class="w-full bg-teal-500 text-white py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out hover:bg-teal-600 disabled:opacity-50"
             >
-              Create Account
+              {{ loading ? 'Creating Account...' : 'Create Account' }}
             </button>
           </div>
         </div>
@@ -84,22 +85,69 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter(); // Initialize router
 const fullName = ref('');
 const email = ref('');
 const password = ref('');
 const errors = ref({});
+const loading = ref(false); // Track loading state
 
-const submitForm = () => {
+const submitForm = async () => {
   errors.value = {};
+
+  // Validate inputs
   if (!fullName.value) errors.value.fullName = 'Full name is required';
   if (!email.value) errors.value.email = 'Email is required';
   else if (!/\S+@\S+\.\S+/.test(email.value)) errors.value.email = 'Email is invalid';
   if (!password.value) errors.value.password = 'Password is required';
 
   if (Object.keys(errors.value).length === 0) {
-    router.push('/'); // Navigate to home page
+    try {
+      loading.value = true; // Start loading
+      const response = await axios.post(
+  'http://localhost:8080/v1/graphql',
+  {
+    query: `
+      mutation Signup($username: String!, $email: String!, $password: String!) {
+        insert_users_one(object: {username: $username, email: $email, password: $password}) {
+          id
+        }
+      }
+    `,
+    variables: {
+      username: fullName.value,
+      email: email.value,
+      password: password.value,
+    },
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Hasura-Admin-Secret': 'myadminsecretkey', // Replace with actual secret
+    },
+  }
+);
+
+
+      
+      // Handle success
+      console.log('Registration successful:', response.data);
+      alert('Signup successful! Redirecting to home ...');
+      router.push('/index'); // Navigate to the login page
+    } catch (error) {
+      // Handle backend validation errors or server issues
+      if (error.response) {
+        console.error('Backend error:', error.response.data);
+        alert('Error: ' + (error.response.data.message || 'Registration failed'));
+      } else {
+        console.error('Unexpected error:', error);
+        alert('An unexpected error occurred. Please try again later.');
+      }
+    } finally {
+      loading.value = false; // End loading
+    }
   }
 };
 

@@ -17,6 +17,7 @@
     "@vee-validate/rules": "^4.14.7",
     "@vue/apollo-composable": "^4.2.1",
     "@vueuse/motion": "^2.2.6",
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "edge-runtime": "^3.0.5",
     "graphql": "^16.9.0",
