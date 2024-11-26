@@ -54,9 +54,9 @@
           <RecipeCard
             v-for="n in 6"
             :key="n"
-            image="/images/salad.jpg"
-            title="Delicious Recipe"
-            description="A quick preview of the recipe details."
+            image="/images/aynet.jpg"
+            title="Aynet"
+            description="Ethiopian food aynet."
           />
         </div>
       </main>
@@ -154,8 +154,8 @@
         <RecipeCard
           v-for="n in 6"
           :key="n"
-          image="/images/salad.jpg"
-          title="Delicious Recipe"
+          image="/images/enjera.jpg"
+          title="Delicious enjera"
           description="A quick preview of the recipe details."
         />
       </div>

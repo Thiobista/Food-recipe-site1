@@ -68,7 +68,7 @@
           <RecipeCard
             v-for="n in 6"
             :key="n"
-            image="/images/salad.jpg"
+            image="/images/enjera.jpg"
             title="Delicious Recipe"
             description="A quick preview of the recipe details."
             @rate="rateRecipe"

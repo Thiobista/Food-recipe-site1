@@ -16,30 +16,30 @@
     <!-- Recipes Grid -->
     <div v-else class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-8">
       <!-- Loop through the user's recipes -->
-      <div v-for="recipe in recipes" :key="recipe.id" class="recipe-card">
+      <div v-for="recipe in recipes" :key="recipe.id" class="recipe-card bg-white p-4 rounded-lg shadow-md flex flex-col">
         <img :src="recipe.image" alt="Recipe" class="w-full h-48 object-cover rounded-lg" />
         <h3 class="text-xl font-semibold mt-4">{{ recipe.title }}</h3>
         <p class="text-sm text-gray-500 mt-2">{{ recipe.description }}</p>
 
         <!-- Edit, Delete, and Share buttons -->
-        <div class="flex justify-between mt-4">
+        <div class="mt-auto flex justify-end space-x-2 pt-4">
           <button
             @click="editRecipe(recipe.id)"
-            class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+            class="flex items-center justify-center bg-orange-500 text-white py-2 px-3 rounded-lg hover:bg-orange-600 transition shadow-md"
           >
-         edit
+            <font-awesome-icon icon="edit" />
           </button>
           <button
             @click="openDeleteModal(recipe.id)"
-            class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
+            class="flex items-center justify-center bg-red-500 text-white py-2 px-3 rounded-lg hover:bg-red-600 transition shadow-md"
           >
-            Delete
+            <font-awesome-icon icon="trash" />
           </button>
           <button
             @click="shareRecipe(recipe)"
-            class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition"
+            class="flex items-center justify-center bg-orange-500 text-white py-2 px-3 rounded-lg hover:bg-oranfe-600 transition shadow-md"
           >
-            Share
+            <font-awesome-icon icon="share-alt" />
           </button>
         </div>
       </div>
@@ -49,7 +49,7 @@
     <div class="mt-8 text-center">
       <button
         @click="goToAddRecipe"
-        class="bg-yellow-500 text-white py-2 px-6 rounded-lg hover:bg-yellow-600 transition"
+        class="bg-yellow-500 text-white py-2 px-6 rounded-full hover:bg-yellow-600 transition shadow-lg"
       >
         Add New Recipe
       </button>
@@ -71,6 +71,28 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.recipe-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+button {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+</style>
+
 
 <script setup>
 import { ref } from 'vue';

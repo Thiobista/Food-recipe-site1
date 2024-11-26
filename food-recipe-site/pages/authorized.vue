@@ -98,20 +98,21 @@
     <main class="container mx-auto py-12">
       <SearchFilterBar />
 
-      <!-- Recipe Cards Grid -->
-      <div class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-8">
-        <RecipeCard
-          v-for="n in 6"
-          :key="n"
-          image="/images/salad.jpg"
-          title="Delicious Recipe"
-          description="A quick preview of the recipe details."
-          @rate="rateRecipe"
-          @comment="commentOnRecipe"
-          @bookmark="bookmarkRecipe"
-          @buy="goToPaymentPage"
-        />
-      </div>
+    
+  <!-- Recipe Cards Grid -->
+  <div class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-8">
+    <RecipeCard
+      v-for="(image, index) in recipeImages"
+      :key="index"
+      :image="image"
+      :title="recipeTitles[index]"
+      :description="recipeDescriptions[index]"
+      @rate="rateRecipe"
+      @comment="commentOnRecipe"
+      @bookmark="bookmarkRecipe"
+      @buy="goToPaymentPage"
+    />
+  </div>
     </main>
     <!-- Footer -->
      <!-- Footer -->
@@ -127,6 +128,52 @@ import { useRouter } from 'vue-router';
 import SearchFilterBar from '~/components/SearchFilterBar.vue';
 import RecipeCard from '~/components/RecipeCard.vue';
 import Footer from '~/components/Footer.vue';
+
+
+
+// Example array of images for the recipe cards
+const recipeImages = [
+  '/images/enjera.jpg',
+  '/images/doro.jpg',
+  '/images/ktfo.jpg',
+  '/images/shiro.jpg',
+  '/images/ful.jpg',
+  '/images/tibs.jpg',
+];
+
+// Example titles for the recipe cards
+const recipeTitles = [
+  'Enjera',
+  'Doro Wot',
+  'Kitfo',
+  'Shiro',
+  'Ful',
+  'Tibs',
+];
+
+// Example descriptions for the recipe cards
+const recipeDescriptions = [
+  'Ethiopian flatbread made from teff flour.',
+  'Spicy chicken stew with hard-boiled eggs.',
+  'Minced raw beef delicacy.',
+  'Spiced chickpea stew.',
+  'Ethiopian breakfast made from fava beans.',
+  'Savory beef stir-fry with spices.',
+];
+
+// Event handlers (implement these as needed)
+const rateRecipe = (id) => {
+  console.log(`Rated recipe ${id}`);
+};
+
+
+
+
+
+
+
+
+
 
 const menuOpen = ref(false);
 const bookmarkedRecipes = ref([]);
@@ -173,6 +220,7 @@ const scrollToRecipes = () => {
     recipesSection.scrollIntoView({ behavior: 'smooth' });
   }
 };
+
 </script>
 
 <style scoped>

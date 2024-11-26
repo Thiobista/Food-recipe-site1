@@ -70,30 +70,38 @@ const bookmarkedRecipes = ref([]);
 const { result: recipesResult, loading, error } = useQuery(GET_BOOKMARKED_RECIPES);
 
 // Fetch data on component mount
+//  error, loading } = useQuery(GET_BOOKMARKED_RECIPES);
+
+// Populate bookmarkedRecipes when data is loaded
 onMounted(() => {
-  if (recipesResult.value) {
-    bookmarkedRecipes.value = recipesResult.value.bookmarkedRecipes || [];
-  }
+  recipesResult.onResult(({ data }) => {
+    if (data && data.bookmarkedRecipes) {
+      bookmarkedRecipes.value = data.bookmarkedRecipes;
+    }
+  });
 });
 
-// Function to handle removing a bookmark
-const { mutate: removeBookmark } = useMutation(REMOVE_BOOKMARK);
+// Mutation to handle removing a bookmark
+const { mutate: removeBookmark, onDone } = useMutation(REMOVE_BOOKMARK);
 
-async function handleRemoveBookmark(recipeId) {
-  try {
-    const response = await removeBookmark({ id: recipeId });
-    if (response.data.removeBookmark.success) {
+// Handle bookmark removal
+const handleRemoveBookmark = (id) => {
+  removeBookmark({ id });
+  onDone(({ data }) => {
+    if (data.removeBookmark.success) {
+      // Update UI after successful removal
       bookmarkedRecipes.value = bookmarkedRecipes.value.filter(
-        (recipe) => recipe.id !== recipeId
+        (recipe) => recipe.id !== id
       );
+      alert("Bookmark removed successfully.");
     } else {
-      console.error(response.data.removeBookmark.message);
+      alert("Failed to remove bookmark. Please try again.");
     }
-  } catch (err) {
-    console.error('Failed to remove bookmark:', err.message);
-  }
-}
+  });
+};
+
 </script>
+
 
 <style scoped>
 /* Styling for the recipe card */

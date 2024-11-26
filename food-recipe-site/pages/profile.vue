@@ -52,7 +52,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Define reactive variables for profile image, username, and password
-const profileImage = ref('/path/to/default-image.jpg');
+const profileImage = ref('/images/profile.jpg');
 const username = ref('');
 const password = ref('');
 

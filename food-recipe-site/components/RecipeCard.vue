@@ -213,12 +213,14 @@ const buyRecipe = () => {
 };
 
 const proceedToPayment = () => {
+  isBuying.value = false; // Close the payment modal
   notification.value = "Redirecting to Chapa for payment...";
   setTimeout(() => {
     notification.value = '';
     window.location.href = "https://chapa.co"; // Redirect to Chapa website
   }, 3000);
 };
+
 
 
 const closePaymentModal = () => {

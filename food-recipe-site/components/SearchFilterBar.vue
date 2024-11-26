@@ -50,8 +50,8 @@ const searchQuery = ref("");
 const selectedCategory = ref("");
 const recipes = ref([
   { id: 1, title: "Vegan Salad", category: "Vegan", image: "/images/salad.jpg" },
-  { id: 2, title: "Quick Pasta", category: "Quick Meals", image: "/images/salad.jpg" },
-  { id: 3, title: "Veggie Stir Fry", category: "Vegan", image: "/images/salad.jpg" },
+  { id: 2, title: "Quick Pasta", category: "Quick Meals", image: "/images/pasta.jpg" },
+  { id: 3, title: "Veggie Stir Fry", category: "Vegan", image: "/images/fry.jpg" },
   // Add more recipes as needed
 ]);
 
