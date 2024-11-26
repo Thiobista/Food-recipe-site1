@@ -1,7 +1,10 @@
 <template>
   <div>
-  <!--  <header>My Custom Header</header>-->
+    <!-- <NuxtWelcome /> Replace with your root layout/component -->
     <NuxtPage />
-   <!--  <footer>My Custom Footer</footer>-->
   </div>
 </template>
+
+<script setup>
+import "@/assets/css/main.css"; // Import global CSS
+</script>

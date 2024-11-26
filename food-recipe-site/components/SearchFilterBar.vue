@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 py-4">
+  <div class="bg-414040 py-4">
     <div class="container mx-auto flex justify-between items-center">
       <!-- Search Input -->
       <input

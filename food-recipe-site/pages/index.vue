@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fufu">
     <!-- Navbar Section -->
     <header>
       <nav class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 p-4 flex justify-between items-center shadow-xl rounded-b-lg fixed top-0 left-0 w-full z-20">
@@ -59,6 +59,7 @@
                 class="p-3 hover:bg-yellow-100 text-red-500 cursor-pointer"
               >
                 Logout
+                
               </li>
             </ul>
           </div>
@@ -75,6 +76,7 @@
         </div>
       </nav>
     </header>
+    
  <!-- Hero Section -->
  <section
       class="relative bg-cover bg-center h-[60vh] rounded-lg overflow-hidden mt-16"
@@ -112,7 +114,9 @@
       </div>
     </main>
     <!-- Footer -->
-    <Footer />
+     <!-- Footer -->
+     <Footer />
+    <!-- <Footer /> -->
   </div>
 </template>
 
@@ -172,6 +176,13 @@ const scrollToRecipes = () => {
 </script>
 
 <style scoped>
+/* Set a background color for the page */
+main {
+  background-color: #414040; /* White */
+}
+.fufu{
+  background-color: #414040; /* White */
+}
 /* Transition for the menu sliding effect */
 .slide-fade-enter-active,
 .slide-fade-leave-active {

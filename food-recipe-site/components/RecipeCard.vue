@@ -2,7 +2,7 @@
   <div class="recipe-card-container">
     <!-- Recipe Card -->
     <div class="recipe-card">
-      <div class="bg-white p-6 shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+      <div class=" shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
         <!-- Recipe Image -->
         <div class="relative">
           <img :src="image" alt="Recipe Image" class="w-full h-56 object-cover rounded-lg shadow-md" />
@@ -10,29 +10,29 @@
 
         <!-- Recipe Title and Description -->
         <div class="mt-4">
-          <h3 class="font-bold text-2xl text-gray-800">{{ title }}</h3>
-          <p class="text-gray-600 text-sm mt-2">{{ description }}</p>
+          <h3 class="font-bold text-2xl text-white-800">{{ title }}</h3>
+          <p class="text-white-600 text-sm mt-2">{{ description }}</p>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex justify-between mt-6 items-center">
+        <div p-7 class="flex justify-between mt-6 items-center">
           <!-- Rate Button -->
           <button @click="openRatingPopup" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
             ⭐ Rate
           </button>
 
           <!-- Bookmark Button -->
-          <button @click="bookmarkRecipe" class="text-blue-500 hover:text-blue-600 transition-colors duration-300 text-lg">
-            🔖 {{ isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+          <button @click="bookmarkRecipe" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
+             {{ isBookmarked ? '✅   Bookmarked' : '🔖Bookmark' }}
           </button>
 
           <!-- Comment Button -->
-          <button @click="showCommentFormModal" class="text-green-500 hover:text-green-600 transition-colors duration-300 text-lg">
+          <button @click="showCommentFormModal" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
             💬 Comment
           </button>
 
           <!-- Buy Button -->
-          <button @click="buyRecipe" class="text-orange-500 hover:text-orange-600 transition-colors duration-300 text-lg">
+          <button @click="buyRecipe" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
             🛒 Buy
           </button>
         </div>
@@ -85,7 +85,7 @@
         </div>
         <textarea v-model="commentText" class="w-full h-24 p-3 border rounded-lg mb-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write your comment here..."></textarea>
         <div class="flex justify-between">
-          <button @click="submitComment" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all">Submit</button>
+          <button @click="submitComment" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all">Submit</button>
           <button @click="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">Cancel</button>
         </div>
       </div>
@@ -97,7 +97,7 @@
         <h3 class="text-xl font-semibold mb-4 text-gray-800">Continue Payment with Chapa</h3>
         <p class="text-gray-700 mb-4">You are about to proceed with the payment.</p>
         <div class="flex justify-between">
-          <button @click="proceedToPayment" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all">Continue</button>
+          <button @click="proceedToPayment" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all">Continue</button>
           <button @click="closePaymentModal" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all">Cancel</button>
         </div>
       </div>
@@ -212,4 +212,7 @@ onMounted(() => {
 
 <style scoped>
 /* Add custom styling as needed */
+.recipe-card{
+  background-color: #554e4e;
+}
 </style>
