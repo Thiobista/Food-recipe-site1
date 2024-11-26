@@ -2,7 +2,10 @@
   <div class="recipe-card-container">
     <!-- Recipe Card -->
     <div class="recipe-card">
-      <div class=" shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+      <div
+  class="shadow-lg rounded-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 flex flex-col bg-red"
+>
+
         <!-- Recipe Image -->
         <div class="relative">
           <img :src="image" alt="Recipe Image" class="w-full h-56 object-cover rounded-lg shadow-md" />
@@ -14,28 +17,45 @@
           <p class="text-white-600 text-sm mt-2">{{ description }}</p>
         </div>
 
-        <!-- Action Buttons -->
-        <div p-7 class="flex justify-between mt-6 items-center">
-          <!-- Rate Button -->
-          <button @click="openRatingPopup" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
-            ⭐ Rate
-          </button>
+      <!-- Action Buttons -->
+<div class="p-7 flex justify-between mt-6 items-center">
+  <!-- Rate Button -->
+  <button
+    @click="openRatingPopup"
+    class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg flex flex-col items-center"
+  >
+    <span class="text-2xl">⭐</span>
+    <span class="text-sm">Rate</span>
+  </button>
 
-          <!-- Bookmark Button -->
-          <button @click="bookmarkRecipe" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
-             {{ isBookmarked ? '✅   Bookmarked' : '🔖Bookmark' }}
-          </button>
+  <!-- Bookmark Button -->
+  <button
+    @click="bookmarkRecipe"
+    class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg flex flex-col items-center"
+  >
+    <span class="text-2xl">{{ isBookmarked ? '✅' : '🔖' }}</span>
+    <span class="text-sm">{{ isBookmarked ? 'Bookmarked' : 'Bookmark' }}</span>
+  </button>
 
-          <!-- Comment Button -->
-          <button @click="showCommentFormModal" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
-            💬 Comment
-          </button>
+  <!-- Comment Button -->
+  <button
+    @click="showCommentFormModal"
+    class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg flex flex-col items-center"
+  >
+    <span class="text-2xl">💬</span>
+    <span class="text-sm">Comment</span>
+  </button>
 
-          <!-- Buy Button -->
-          <button @click="buyRecipe" class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg">
-            🛒 Buy
-          </button>
-        </div>
+  <!-- Buy Button -->
+  <button
+    @click="buyRecipe"
+    class="text-yellow-500 hover:text-yellow-600 transition-colors duration-300 text-lg flex flex-col items-center"
+  >
+    <span class="text-2xl">🛒</span>
+    <span class="text-sm">Buy</span>
+  </button>
+</div>
+
       </div>
     </div>
 
@@ -196,9 +216,10 @@ const proceedToPayment = () => {
   notification.value = "Redirecting to Chapa for payment...";
   setTimeout(() => {
     notification.value = '';
-    closePaymentModal();
+    window.location.href = "https://chapa.co"; // Redirect to Chapa website
   }, 3000);
 };
+
 
 const closePaymentModal = () => {
   isBuying.value = false;
@@ -212,7 +233,5 @@ onMounted(() => {
 
 <style scoped>
 /* Add custom styling as needed */
-.recipe-card{
-  background-color: #554e4e;
-}
+
 </style>

@@ -27,7 +27,7 @@
             @click="editRecipe(recipe.id)"
             class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
           >
-            Edit
+         edit
           </button>
           <button
             @click="openDeleteModal(recipe.id)"

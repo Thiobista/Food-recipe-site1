@@ -178,10 +178,10 @@ const scrollToRecipes = () => {
 <style scoped>
 /* Set a background color for the page */
 main {
-  background-color: #414040; /* White */
+  background-color: white; /* White */
 }
 .fufu{
-  background-color: #414040; /* White */
+  background-color: white; /* White */
 }
 /* Transition for the menu sliding effect */
 .slide-fade-enter-active,
