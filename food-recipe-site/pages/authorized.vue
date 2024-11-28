@@ -49,7 +49,7 @@
                 My Recipes
               </li>
               <li
-                @click="goToPage('/bookmarks')"
+                @click="goToPage('/bookmark')"
                 class="p-3 hover:bg-yellow-100 cursor-pointer"
               >
                 Bookmarks

@@ -1,4 +1,38 @@
-<template>
+
+  <template>
+  <div class="recipe-card-container">
+    <!-- Search Bar -->
+    <!-- <div class="search-bar mb-4">
+      <input
+        type="text"
+        v-model="searchQuery"
+        placeholder="Search recipes..."
+        class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+      />
+    </div> -->
+
+    <!-- Recipe Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-for="recipe in filteredRecipes"
+        :key="recipe.id"
+        class="recipe-card shadow-lg rounded-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 flex flex-col bg-red"
+      >
+        <!-- Recipe Image -->
+        <div class="relative">
+          <img :src="recipe.image" alt="Recipe Image" class="w-full h-56 object-cover rounded-lg shadow-md" />
+        </div>
+
+        <!-- Recipe Title and Description -->
+        <div class="mt-4">
+          <h3 class="font-bold text-2xl text-white-800">{{ recipe.title }}</h3>
+          <p class="text-white-600 text-sm mt-2">{{ recipe.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="recipe-card-container">
     <!-- Recipe Card -->
     <div class="recipe-card">
@@ -59,26 +93,30 @@
       </div>
     </div>
 
-    <!-- Rating Popup -->
-    <div v-if="showRatingPopup" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex justify-center items-center z-30">
-      <div class="bg-white p-6 rounded-lg shadow-xl w-80">
-        <h3 class="text-xl font-semibold mb-4 text-gray-800">Select Your Rating</h3>
-        <div class="flex justify-center space-x-1">
-          <i
-            v-for="star in 5"
-            :key="star"
-            @click="setRating(star)"
-            :class="[star <= (hoverRating || currentRating) ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300', 'cursor-pointer text-3xl transition-transform transform hover:scale-110']"
-            @mouseover="hoverRating = star"
-            @mouseleave="hoverRating = currentRating"
-          ></i>
-        </div>
-        <div class="flex justify-center mt-6 space-x-4">
-          <button @click="cancelRating" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all">Cancel</button>
-          <button @click="confirmRating" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all">OK</button>
-        </div>
-      </div>
+   <!-- Rating Popup -->
+<div v-if="showRatingPopup" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex justify-center items-center z-30">
+  <div class="bg-white p-6 rounded-lg shadow-xl w-80">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800">Select Your Rating</h3>
+    <div class="flex justify-center space-x-1">
+      <i
+        v-for="star in 5"
+        :key="star"
+        @click="setRating(star)"
+        :class="[
+          star <= (hoverRating || currentRating) ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300',
+          'cursor-pointer text-3xl transition-transform transform hover:scale-110'
+        ]"
+        @mouseover="hoverRating = star"
+        @mouseleave="hoverRating = currentRating"
+      ></i>
     </div>
+    <div class="flex justify-center mt-6 space-x-4">
+      <button @click="cancelRating" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all">Cancel</button>
+      <button @click="confirmRating" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-all">OK</button>
+    </div>
+  </div>
+</div>
+
 
     <!-- Comments Section -->
     <div v-if="showComments" class="mt-8">
@@ -131,7 +169,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+// import { config } from '@fortawesome/fontawesome-svg-core';
+// config.autoAddCss = false;
+
+// const searchQuery = ref(""); // Reactive property for search input
+
+// const recipes = ref([
+//   { id: 1, title: "Chocolate Cake", description: "Delicious chocolate dessert", image: "path/to/image1.jpg" },
+//   { id: 2, title: "Pasta", description: "Classic Italian pasta", image: "path/to/image2.jpg" },
+//   { id: 3, title: "Tacos", description: "Spicy Mexican tacos", image: "path/to/image3.jpg" },
+//   // Add more recipes as needed
+// ]);
+
+// // Computed property to filter recipes based on the search query
+// const filteredRecipes = computed(() => {
+//   if (!searchQuery.value) return recipes.value;
+//   return recipes.value.filter((recipe) =>
+//     recipe.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+//     recipe.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+//   );
+// });
+
+
+
 
 const props = defineProps({
   image: String,

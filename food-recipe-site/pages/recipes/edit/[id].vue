@@ -156,7 +156,7 @@ function handleFileUpload(event) {
 // Method to update recipe
 async function updateRecipe() {
   console.log('Updated recipe:', recipe.value);
-  router.push('/'); // Navigate back to the home or My Recipes page after saving
+  router.push('/my-recipes'); // Navigate back to the home or My Recipes page after saving
 }
 </script>
 

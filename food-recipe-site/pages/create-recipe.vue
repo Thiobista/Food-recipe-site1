@@ -141,7 +141,7 @@ const submitRecipe = () => {
     return;
   }
   console.log('Recipe submitted:', recipe.value);
-  router.push('/');
+  router.push('/authorized');
 };
 </script>
 

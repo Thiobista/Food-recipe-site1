@@ -6,7 +6,7 @@
         v-model="searchQuery"
         type="text"
         placeholder="Search Recipes..."
-        class="px-4 py-2 w-1/3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+        class="px-4 py-2 w-1/3 rounded-lg border border-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
       />
       <div class="flex space-x-4">
         <!-- Category Dropdown -->
@@ -67,6 +67,10 @@ const filteredRecipes = computed(() =>
     return matchesSearchQuery && matchesCategory;
   })
 );
+// Load initial recipes (if coming from an API or external source)
+onMounted(() => {
+  // Fetch recipes if necessary
+});
 </script>
 
 <style scoped>
