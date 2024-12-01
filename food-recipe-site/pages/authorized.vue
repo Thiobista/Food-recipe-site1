@@ -1,5 +1,6 @@
 <template>
   <div class="fufu">
+    <Header />
     <!-- Navbar Section -->
     <header>
       <nav class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 p-4 flex justify-between items-center shadow-xl rounded-b-lg fixed top-0 left-0 w-full z-20">
@@ -270,7 +271,17 @@ button:hover {
     opacity: 1;
   }
 }
+.text-gray-400 {
+  color: #d1d5db; /* Tailwind's gray-400 */
+}
 
+.text-yellow-500 {
+  color: #f59e0b; /* Tailwind's yellow-500 */
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
 /* Hover and transition effects for buttons */
 button:hover {
   transform: scale(1.05);

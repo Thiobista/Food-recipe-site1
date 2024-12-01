@@ -1,5 +1,6 @@
 <template>
     <div class="container mx-auto py-10 px-4">
+      <Header />
       <!-- Page Title -->
       <h1 class="text-4xl font-bold text-yellow-500 text-center">Our Blog</h1>
       <p class="text-gray-700 mt-4 text-center">

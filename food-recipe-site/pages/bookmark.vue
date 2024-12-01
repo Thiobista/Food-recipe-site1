@@ -1,132 +1,294 @@
 <template>
-    <div>
-      <!-- Bookmarked Recipes Section -->
-      <h2 class="text-2xl font-bold mb-6">Bookmarked Recipes</h2>
-  
-      <div v-if="bookmarkedRecipes.length === 0" class="text-center text-gray-500">
-        <p>No recipes bookmarked yet.</p>
-      </div>
-  
-      <div v-else class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-8">
-        <!-- Displaying Bookmarked Recipes -->
-        <div
-          v-for="recipe in bookmarkedRecipes"
-          :key="recipe.id"
-          class="recipe-card"
+  <div class="fufu">
+    <Header />
+
+    <!-- Bookmarks Section -->
+    <main class="container mx-auto py-16 mt-12">
+      <h1 class="text-3xl font-bold text-center mb-8">Your Bookmarked Recipes</h1>
+      <div v-if="bookmarkedRecipes.length === 0" class="text-center text-gray-600">
+        <p>You don't have any bookmarked recipes yet.</p>
+        <button
+          class="mt-4 bg-yellow-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-yellow-600 transition duration-300"
+          @click="goToPage('/recipes')"
         >
-          <img
-            :src="recipe.image"
-            :alt="`Image of ${recipe.title}`"
-            class="w-full h-48 object-cover rounded-lg"
-          />
-          <h3 class="text-xl font-semibold mt-4">{{ recipe.title }}</h3>
-          <p class="text-sm text-gray-500 mt-2">{{ recipe.description }}</p>
-  
-          <!-- Form Validation for Removing Bookmark -->
-          <Form @submit="handleRemoveBookmark(recipe.id)">
-            <button
-              type="submit"
-              class="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
-            >
-              Remove Bookmark
-            </button>
-          </Form>
-        </div>
+          <i class="fas fa-search"></i> Explore Recipes
+        </button>
+      </div>
+
+      <div v-else class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div
+  v-for="(recipe, index) in bookmarkedRecipes"
+  :key="index"
+  class="recipe-card bg-white rounded-lg shadow-lg overflow-hidden relative flex flex-col"
+>
+  <img :src="recipe.image" :alt="recipe.title" class="w-full h-40 object-cover" />
+  <div class="p-4 flex-grow">
+    <h2 class="text-xl font-bold">{{ recipe.title }}</h2>
+    <p class="text-gray-600 text-sm mb-4">{{ recipe.description }}</p>
+  </div>
+  <div class="action-bar bg-gray-100 p-2 flex justify-around border-t border-gray-200">
+    <button
+      class="flex flex-col items-center text-red-500 hover:text-red-600"
+      @click="removeBookmark(recipe.id)"
+      aria-label="Remove Bookmark"
+    >
+      <font-awesome-icon icon="trash" class="text-xl" />
+      <span class="text-sm">Remove</span>
+    </button>
+    <button
+      class="flex flex-col items-center text-orange-500 hover:text-orange-600"
+      @click="shareRecipe(recipe)"
+      aria-label="Share Recipe"
+    >
+      <font-awesome-icon icon="share" class="text-xl" />
+      <span class="text-sm">Share</span>
+    </button>
+    <button
+      class="flex flex-col items-center text-orange-500 hover:text-orange-600"
+      @click="openRateModal(recipe.id)"
+      aria-label="Rate Recipe"
+    >
+      <font-awesome-icon icon="star" class="text-xl" />
+      <span class="text-sm">Rate</span>
+    </button>
+    <button
+      class="flex flex-col items-center text-orange-500 hover:text-orange-600"
+      @click="openCommentModal(recipe.id)"
+      aria-label="Comment on Recipe"
+    >
+      <font-awesome-icon icon="comment" class="text-xl" />
+      <span class="text-sm">Comment</span>
+    </button>
+  </div>
+</div>
+
+      </div>
+
+      <!-- Rate Modal -->
+<transition name="fade">
+  <div v-if="showRateModal" class="modal">
+    <div class="modal-content max-w-md p-6 bg-white rounded-lg shadow-lg relative">
+      <h2 class="text-2xl font-bold mb-4">Rate Recipe</h2>
+      <p class="mb-4">Rate <span class="font-semibold">{{ selectedRecipe?.title }}</span></p>
+      <div class="flex justify-center mb-4">
+        <span
+          v-for="star in 5"
+          :key="star"
+          class="cursor-pointer text-4xl"
+          :class="{
+            'text-yellow-500': star <= starRating,
+            'text-gray-400': star > starRating,
+          }"
+          @click="setRating(star)"
+        >
+          ★
+        </span>
+      </div>
+      <div class="flex justify-end gap-4">
+        <button
+          class="py-2 px-4 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+          @click="submitRating"
+        >
+          Submit
+        </button>
+        <button
+          class="py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+          @click="closeModals"
+        >
+          Cancel
+        </button>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import { Form } from 'vee-validate';
-  import { useQuery, useMutation } from '@vue/apollo-composable';
-  
-  // Apollo Query for loading bookmarked recipes
-  const GET_BOOKMARKED_RECIPES = `
-    query GetBookmarkedRecipes {
-      bookmarkedRecipes {
-        id
-        title
-        description
-        image
-      }
-    }
-  `;
-  
-  // Apollo Mutation for removing a bookmark
-  const REMOVE_BOOKMARK = `
-    mutation RemoveBookmark($id: ID!) {
-      removeBookmark(id: $id) {
-        success
-        message
-      }
-    }
-  `;
-  
-  // Reactive state for bookmarked recipes
-  const bookmarkedRecipes = ref([]);
-  
-  // Load bookmarked recipes with Apollo query
-  const { result: recipesResult, loading, error } = useQuery(GET_BOOKMARKED_RECIPES);
-  
-  // Fetch data on component mount
-  //  error, loading } = useQuery(GET_BOOKMARKED_RECIPES);
-  
-  // Populate bookmarkedRecipes when data is loaded
-  onMounted(() => {
-    recipesResult.onResult(({ data }) => {
-      if (data && data.bookmarkedRecipes) {
-        bookmarkedRecipes.value = data.bookmarkedRecipes;
-      }
-    });
-  });
-  
-  // Mutation to handle removing a bookmark
-  const { mutate: removeBookmark, onDone } = useMutation(REMOVE_BOOKMARK);
-  
-  // Handle bookmark removal
-  const handleRemoveBookmark = (id) => {
-    removeBookmark({ id });
-    onDone(({ data }) => {
-      if (data.removeBookmark.success) {
-        // Update UI after successful removal
-        bookmarkedRecipes.value = bookmarkedRecipes.value.filter(
-          (recipe) => recipe.id !== id
-        );
-        alert("Bookmark removed successfully.");
-      } else {
-        alert("Failed to remove bookmark. Please try again.");
-      }
-    });
+  </div>
+</transition>
+
+
+     
+    <!-- Comment Modal -->
+<transition name="fade">
+  <div v-if="showCommentModal" class="modal">
+    <div class="modal-content max-w-md p-6 bg-white rounded-lg shadow-lg relative">
+      <h2 class="text-2xl font-bold mb-4">Comments for {{ selectedRecipe?.title }}</h2>
+
+      <!-- Existing Comments Section -->
+      <div class="comments-section mb-4">
+        <h3 class="text-lg font-semibold mb-2">Existing Comments:</h3>
+        <div v-if="selectedRecipe?.comments?.length">
+          <ul class="space-y-2">
+            <li v-for="(comment, index) in selectedRecipe.comments" :key="index" class="bg-gray-100 p-3 rounded-lg">
+              {{ comment }}
+            </li>
+          </ul>
+        </div>
+        <p v-else class="text-gray-500">No comments yet. Be the first to comment!</p>
+      </div>
+
+      <!-- Add New Comment Section -->
+      <textarea
+        v-model="comment"
+        class="input mb-4 border-gray-300 focus:ring-2 focus:ring-yellow-500"
+        placeholder="Write your comment here..."
+      ></textarea>
+      <div class="flex justify-end gap-4">
+        <button
+          class="py-2 px-4 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+          @click="submitComment"
+        >
+          Submit
+        </button>
+        <button
+          class="py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+          @click="closeModals"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</transition>
+
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const bookmarkedRecipes = ref([
+  {
+    id: 1,
+    title: 'Doro Wot',
+    description: 'Spicy chicken stew with hard-boiled eggs.',
+    image: '/images/doro.jpg',
+    comments: [], // Add this
+  },
+  {
+    id: 2,
+    title: 'Shiro',
+    description: 'Spiced chickpea stew.',
+    image: '/images/shiro.jpg',
+    comments: [], // Add this
+  },
+]);
+
+
+const router = useRouter();
+const goToPage = (route) => {
+  router.push(route);
+};
+const showRateModal = ref(false);
+const showCommentModal = ref(false);
+const selectedRecipe = ref(null);
+const rating = ref('');
+const comment = ref('');
+
+const removeBookmark = (id) => {
+  bookmarkedRecipes.value = bookmarkedRecipes.value.filter((recipe) => recipe.id !== id);
+};
+
+const openRateModal = (id) => {
+  selectedRecipe.value = bookmarkedRecipes.value.find((recipe) => recipe.id === id);
+  showRateModal.value = true;
+};
+
+const submitRating = () => {
+  console.log(`Rated ${selectedRecipe.value.title}: ${starRating.value} stars`);
+  closeModals();
+};
+
+const openCommentModal = (id) => {
+  selectedRecipe.value = bookmarkedRecipes.value.find((recipe) => recipe.id === id);
+  showCommentModal.value = true;
+};
+
+const submitComment = () => {
+  if (!comment.value.trim()) return; // Prevent empty comments
+  selectedRecipe.value.comments.unshift(comment.value.trim()); // Add new comment to the top
+  comment.value = ''; // Clear the input
+  console.log(`Commented on ${selectedRecipe.value.title}: ${selectedRecipe.value.comments}`);
+};
+
+const closeModals = () => {
+  showRateModal.value = false;
+  showCommentModal.value = false;
+  selectedRecipe.value = null;
+  rating.value = '';
+  comment.value = '';
+};
+
+const shareRecipe = (recipe) => {
+  const shareData = {
+    title: recipe.title,
+    text: recipe.description,
+    url: window.location.href,
   };
-  
-  </script>
-  
-  
-  <style scoped>
-  /* Styling for the recipe card */
-  .recipe-card {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  if (navigator.share) {
+    navigator.share(shareData).catch((err) => console.error(err));
+  } else {
+    alert('Sharing not supported.');
   }
-  
-  .recipe-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+};
+const starRating = ref(0);
+
+const setRating = (rating) => {
+  starRating.value = rating;
+};
+
+
+
+</script>
+
+<style scoped>
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  animation: slideDown 0.3s ease-in-out;
+}
+
+.text-gray-400 {
+  color: #d1d5db; /* Tailwind's gray-400 */
+}
+
+.text-yellow-500 {
+  color: #f59e0b; /* Tailwind's yellow-500 */
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
   }
-  
-  .recipe-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  button {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  </style>
-  
+}
+</style>

@@ -1,5 +1,9 @@
 <template>
   <div class="flex items-center justify-center h-screen bg-gray-100">
+     <!-- Header Section -->
+     <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+      <Header />
+    </div>
     <div class="bg-white p-8 rounded-lg shadow-md text-center w-80">
       <h2 class="text-2xl font-semibold text-gray-800 mb-4">Logout</h2>
       <p class="text-gray-600 mb-6">Are you sure you want to log out?</p>

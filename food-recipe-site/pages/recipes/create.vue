@@ -1,5 +1,6 @@
 <template>
     <div>
+      <Header />
       <h1 class="text-2xl font-bold">Create a Recipe</h1>
       <form @submit.prevent="submitForm">
         <VeeValidateForm>

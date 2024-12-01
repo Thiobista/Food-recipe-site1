@@ -1,5 +1,6 @@
 <template>
   <div class="fufu">
+    <Header />
     <!-- Navbar Section -->
     <header>
       <nav class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 p-4 flex justify-between items-center shadow-xl rounded-b-lg fixed top-0 left-0 w-full z-20">

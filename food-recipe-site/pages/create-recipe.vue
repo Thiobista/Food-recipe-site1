@@ -1,5 +1,12 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 py-12 px-4">
+      <!-- Header Section -->
+      <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+      <Header />
+    </div>
+          <!-- Content Section -->
+    <div class="pt-20 px-4"> <!-- Added padding to push content below the fixed header -->
+    </div>
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
       <h1 class="text-4xl font-bold text-gray-800 text-center mb-8">Create a New Recipe</h1>
 
@@ -110,12 +117,15 @@
       </form>
     </div>
   </div>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-
+// Define recipes as reactive to hold all recipes
+const recipes = ref([]);
+// Recipe form data
 const recipe = ref({
   title: '',
   description: '',
@@ -125,24 +135,36 @@ const recipe = ref({
   category: '',
   image: null,
 });
-
 const router = useRouter();
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
-    recipe.value.image = file;
+    recipe.value.image = URL.createObjectURL(file);
   }
 };
 
+// Submit recipe and add to list
 const submitRecipe = () => {
-  if (!recipe.value.title || !recipe.value.description || !recipe.value.ingredients || !recipe.value.steps || !recipe.value.time || !recipe.value.category) {
-    alert("Please fill out all required fields.");
-    return;
+  if (recipe.value.title && recipe.value.description) {
+    // Assign a unique ID to the new recipe
+    const newRecipe = { ...recipe.value, id: Date.now() };
+    recipes.value.push(newRecipe);
+
+    // Clear the form
+    Object.keys(recipe.value).forEach((key) => {
+      recipe.value[key] = key === 'image' ? null : '';
+    });
+
+    // Navigate to the My Recipes page
+    router.push('/my-recipes');}
+    else {
+      alert('Please fill in all required fields.');
   }
-  console.log('Recipe submitted:', recipe.value);
-  router.push('/authorized');
 };
+console.log('Submitting recipe:', recipe.value);
+
+
 </script>
 
 <style scoped>

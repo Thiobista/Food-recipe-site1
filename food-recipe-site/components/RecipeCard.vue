@@ -65,13 +65,17 @@
         <h3 class="text-xl font-semibold mb-4 text-gray-800">Select Your Rating</h3>
         <div class="flex justify-center space-x-1">
           <i
-            v-for="star in 5"
-            :key="star"
-            @click="setRating(star)"
-            :class="[star <= (hoverRating || currentRating) ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300', 'cursor-pointer text-3xl transition-transform transform hover:scale-110']"
-            @mouseover="hoverRating = star"
-            @mouseleave="hoverRating = currentRating"
-          ></i>
+  v-for="star in 5"
+  :key="star"
+  @click="setRating(star)"
+  :class="[
+    star <= (hoverRating || currentRating) ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-600', // Update this class for better contrast
+    'cursor-pointer text-3xl transition-transform transform hover:scale-110'
+  ]"
+  @mouseover="hoverRating = star"
+  @mouseleave="hoverRating = currentRating"
+/>
+
         </div>
         <div class="flex justify-center mt-6 space-x-4">
           <button @click="cancelRating" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all">Cancel</button>
@@ -235,5 +239,9 @@ onMounted(() => {
 
 <style scoped>
 /* Add custom styling as needed */
+.text-gray-600 {
+  color: #6b7280; /* This is darker gray */
+}
+
 
 </style>   

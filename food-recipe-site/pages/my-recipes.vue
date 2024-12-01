@@ -1,10 +1,18 @@
 <template>
-  <div>
-    <!-- Success Message -->
-    <div v-if="showSuccessMessage" class="fixed top-4 right-4 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
-      <p>{{ message }}</p>
+  <div class="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 py-12 px-4">
+       <!-- Header Section -->
+       <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+      <Header />
     </div>
 
+    <!-- Content Section -->
+    <div class="pt-20 px-4"> <!-- Added padding to push content below the fixed header -->
+    <!-- Success Message -->
+    <div v-if="showSuccessMessage" class="fixed top-4 right-4 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+    
+      <p>{{ message }}</p>
+    </div>
+   
     <!-- My Recipes Page Heading -->
     <h2 class="text-3xl font-bold mb-6 text-center">My Recipes</h2>
 
@@ -54,7 +62,7 @@
         Add New Recipe
       </button>
     </div>
-
+</div>
     <!-- Delete Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
@@ -102,10 +110,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 // Example recipe data (replace with actual fetch or state management)
-const recipes = ref([
-  { id: 1, title: 'Chocolate Cake', description: 'A delicious chocolate cake recipe.', image: '/images/chocolate.jpg' },
-  { id: 2, title: 'Apple Pie', description: 'A traditional apple pie recipe.', image: '/images/apple.jpg' },
-]);
+const recipes = ref([]);
 
 // Delete modal visibility and selected recipe ID
 const showDeleteModal = ref(false);

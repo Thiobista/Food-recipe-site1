@@ -1,5 +1,6 @@
 <template>
   <div class="relative min-h-screen bg-cover bg-center flex items-center justify-center">
+    <Header />
     <!-- Blurred Background Layer -->
     <div 
       class="absolute inset-0 bg-cover bg-center blur-sm" 

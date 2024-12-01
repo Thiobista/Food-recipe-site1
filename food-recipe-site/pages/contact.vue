@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
+    <Header />
     <h1 class="text-3xl font-bold text-center text-yellow-500">Contact Us</h1>
     <form @submit.prevent="submitForm" class="max-w-md mx-auto mt-6 bg-white p-4 shadow-md rounded-lg">
       <div class="mb-4">

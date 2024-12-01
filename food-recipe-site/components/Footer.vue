@@ -15,7 +15,15 @@
         <div>
           <h2 class="text-xl font-bold text-yellow-500 mb-4">Quick Links</h2>
           <ul class="space-y-2">
-            <li><router-link to="#" class="hover:text-yellow-400 transition-colors">Home</router-link></li>
+            <li>
+              <router-link 
+                to="/" 
+                class="hover:text-yellow-400 transition-colors" 
+                @click.native="scrollToTop"
+              >
+                Home
+              </router-link>
+            </li>
             <li><router-link to="/my-recipes" class="hover:text-yellow-400 transition-colors">Recipes</router-link></li>
             <li><router-link to="/blog" class="hover:text-yellow-400 transition-colors">Blog</router-link></li>
             <li><router-link to="/contact" class="hover:text-yellow-400 transition-colors">Contact Us</router-link></li>
@@ -57,6 +65,13 @@
     </div>
   </footer>
 </template>
+
+<script setup>
+// Scroll to top when "Home" is clicked
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+</script>
 
 <style scoped>
 footer {

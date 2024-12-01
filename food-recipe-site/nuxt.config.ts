@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-11-23',
   css: [
+    '@/assets/css/tailwind.css',
     "@/assets/css/main.css", // Main Tailwind CSS
     "@fortawesome/fontawesome-svg-core/styles.css", // Font Awesome styles
   ],
@@ -33,6 +34,9 @@ export default defineNuxtConfig({
       "@fortawesome/free-solid-svg-icons",
       "@fortawesome/free-brands-svg-icons",
       "@fortawesome/vue-fontawesome",
+       '@heroicons/vue'
+
+      // If using any specific dependencies
     ], // Ensure Font Awesome is transpiled
   },
   runtimeConfig: {

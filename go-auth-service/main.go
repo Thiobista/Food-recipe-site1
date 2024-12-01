@@ -25,6 +25,79 @@ type SignupResponse struct {
 	Message string `json:"message"`
 	UserID  string `json:"userId"` // Changed from int to string
 }
+// RecipeInput struct for receiving recipe data
+type RecipeInput struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Ingredients string `json:"ingredients"`
+	Steps       string `json:"steps"`
+	Time        string `json:"time"`
+	Category    string `json:"category"`
+	Image       string `json:"image"` // Assume base64 or image URL
+	UserID      string `json:"userId"` // Ensure authenticated user sends this
+}
+
+// RecipeHandler handles recipe creation
+func RecipeHandler(w http.ResponseWriter, r *http.Request) {
+	var input RecipeInput
+
+	// Decode the request body
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Example: Validate input
+	if input.Title == "" || input.Description == "" {
+		http.Error(w, "Title and Description are required", http.StatusBadRequest)
+		return
+	}
+
+	// Create a GraphQL client
+	client := graphql.NewClient(hasuraEndpoint)
+
+	// Define the GraphQL mutation
+	req := graphql.NewRequest(`
+		mutation($title: String!, $description: String!, $ingredients: String!, $steps: String!, $time: String!, $category: String!, $userId: String!) {
+			insert_recipes_one(object: {title: $title, description: $description, ingredients: $ingredients, steps: $steps, time: $time, category: $category, user_id: $userId}) {
+				id
+			}
+		}
+	`)
+
+	// Set mutation variables
+	req.Var("title", input.Title)
+	req.Var("description", input.Description)
+	req.Var("ingredients", input.Ingredients)
+	req.Var("steps", input.Steps)
+	req.Var("time", input.Time)
+	req.Var("category", input.Category)
+	req.Var("userId", input.UserID)
+
+	// Add Hasura admin secret
+	req.Header.Set("x-hasura-admin-secret", hasuraAdminSecret)
+
+	// Execute the mutation
+	var resp struct {
+		InsertRecipesOne struct {
+			ID string `json:"id"`
+		} `json:"insert_recipes_one"`
+	}
+
+	err = client.Run(context.Background(), req, &resp)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error inserting recipe: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with success
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Recipe created successfully!",
+		"recipeId": resp.InsertRecipesOne.ID,
+	})
+}
 
 // Hasura GraphQL client configuration
 var hasuraEndpoint = "http://localhost:8080/v1/graphql" // Adjust to match your Hasura instance
@@ -90,6 +163,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/signup", SignupHandler).Methods("POST")
+	r.HandleFunc("/create-recipe", RecipeHandler).Methods("POST")
 
 	// CORS configuration
 	corsHandler := handlers.CORS(
