@@ -3,7 +3,6 @@
       <!-- Header Section -->
       <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
       <Header />
-    </div>
           <!-- Content Section -->
     <div class="pt-20 px-4"> <!-- Added padding to push content below the fixed header -->
     </div>
@@ -117,7 +116,7 @@
       </form>
     </div>
   </div>
-
+</div>
 </template>
 
 <script setup>

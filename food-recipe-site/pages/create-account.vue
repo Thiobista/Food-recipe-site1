@@ -79,6 +79,16 @@
           Continue Without Account
         </button>
       </div>
+
+      <!-- Login Button -->
+      <div class="mt-2 text-center">
+        <button
+          @click="goToLogin"
+          class="text-teal-500 underline hover:text-teal-700 transition duration-200"
+        >
+          Already have an account? Login
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -88,17 +98,15 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
-const router = useRouter(); // Initialize router
+const router = useRouter();
 const fullName = ref('');
 const email = ref('');
 const password = ref('');
 const errors = ref({});
-const loading = ref(false); // Track loading state
+const loading = ref(false);
 
 const submitForm = async () => {
   errors.value = {};
-
-  // Validate inputs
   if (!fullName.value) errors.value.fullName = 'Full name is required';
   if (!email.value) errors.value.email = 'Email is required';
   else if (!/\S+@\S+\.\S+/.test(email.value)) errors.value.email = 'Email is invalid';
@@ -106,57 +114,48 @@ const submitForm = async () => {
 
   if (Object.keys(errors.value).length === 0) {
     try {
-      loading.value = true; // Start loading
+      loading.value = true;
       const response = await axios.post(
-  'http://localhost:8080/v1/graphql',
-  {
-    query: `
-      mutation Signup($username: String!, $email: String!, $password: String!) {
-        insert_users_one(object: {username: $username, email: $email, password: $password}) {
-          id
+        'http://localhost:8080/v1/graphql',
+        {
+          query: `
+            mutation Signup($username: String!, $email: String!, $password: String!) {
+              insert_users_one(object: {username: $username, email: $email, password: $password}) {
+                id
+              }
+            }
+          `,
+          variables: {
+            username: fullName.value,
+            email: email.value,
+            password: password.value,
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Hasura-Admin-Secret': 'myadminsecretkey',
+          },
         }
-      }
-    `,
-    variables: {
-      username: fullName.value,
-      email: email.value,
-      password: password.value,
-    },
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Hasura-Admin-Secret': 'myadminsecretkey', // Replace with actual secret
-    },
-  }
-);
-
-
-      
-      // Handle success
-      console.log('Registration successful:', response.data);
-      // alert('Signup successful! Redirecting to home ...');
-      router.push('/authorized'); // Navigate to the login page
+      );
+      router.push('/authorized');
     } catch (error) {
-      // Handle backend validation errors or server issues
       if (error.response) {
-        console.error('Backend error:', error.response.data);
         alert('Error: ' + (error.response.data.message || 'Registration failed'));
       } else {
-        console.error('Unexpected error:', error);
         alert('An unexpected error occurred. Please try again later.');
       }
     } finally {
-      loading.value = false; // End loading
+      loading.value = false;
     }
   }
 };
 
 const continueWithoutAccount = () => {
-  router.push('/'); // Navigate to home page
+  router.push('/');
+};
+
+const goToLogin = () => {
+  router.push('/login'); // Navigate to the login page
 };
 </script>
-
-<style scoped>
-/* Scoped styles, if necessary */
-</style>
