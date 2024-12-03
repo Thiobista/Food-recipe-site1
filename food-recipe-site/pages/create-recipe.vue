@@ -3,6 +3,7 @@
       <!-- Header Section -->
       <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
       <Header />
+    </div>
           <!-- Content Section -->
     <div class="pt-20 px-4"> <!-- Added padding to push content below the fixed header -->
     </div>
@@ -116,55 +117,63 @@
       </form>
     </div>
   </div>
-</div>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-// Define recipes as reactive to hold all recipes
-const recipes = ref([]);
-// Recipe form data
+import axios from 'axios';
+
 const recipe = ref({
-  title: '',
-  description: '',
-  ingredients: '',
-  steps: '',
-  time: '',
-  category: '',
-  image: null,
+    title: '',
+    description: '',
+    ingredients: '',
+    steps: '',
+    time: '',
+    category: '',
+    image: null,
 });
+
 const router = useRouter();
 
 const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    recipe.value.image = URL.createObjectURL(file);
-  }
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            recipe.value.image = e.target.result; // Save the base64 image
+        };
+        reader.readAsDataURL(file);
+    }
 };
 
-// Submit recipe and add to list
-const submitRecipe = () => {
-  if (recipe.value.title && recipe.value.description) {
-    // Assign a unique ID to the new recipe
-    const newRecipe = { ...recipe.value, id: Date.now() };
-    recipes.value.push(newRecipe);
+const submitRecipe = async () => {
+    try {
+        // Make the POST request
+        const response = await axios.post('http://localhost:8081/create-recipe', {
+            title: recipe.value.title,
+            description: recipe.value.description,
+            ingredients: recipe.value.ingredients,
+            steps: recipe.value.steps,
+            time: recipe.value.time,
+            category: recipe.value.category,
+            image: recipe.value.image,
+            userId: 'exampleUserId123', // Replace with the actual logged-in user's ID
+        });
 
-    // Clear the form
-    Object.keys(recipe.value).forEach((key) => {
-      recipe.value[key] = key === 'image' ? null : '';
-    });
-
-    // Navigate to the My Recipes page
-    router.push('/my-recipes');}
-    else {
-      alert('Please fill in all required fields.');
-  }
+        // Redirect or show success message
+        console.log(response.data.message);
+        router.push('/my-recipes'); // Navigate to the homepage or another page
+    } catch (error) {
+        console.error('Error submitting recipe:', error.response?.data || error.message);
+        alert('Failed to submit the recipe. Please try again.');
+    }
 };
-console.log('Submitting recipe:', recipe.value);
-
 
 </script>
+
+
 
 <style scoped>
 body {

@@ -133,23 +133,24 @@ const submitForm = async () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'X-Hasura-Admin-Secret': 'myadminsecretkey',
+            'x-hasura-admin-secret': 'myadminsecretkey',
           },
         }
       );
-      router.push('/authorized');
-    } catch (error) {
-      if (error.response) {
-        alert('Error: ' + (error.response.data.message || 'Registration failed'));
-      } else {
-        alert('An unexpected error occurred. Please try again later.');
+
+      if (response.data.data?.insert_users_one?.id) {
+        alert('Account created successfully!');
+        router.push('/login'); // Redirect to login page
       }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('An unexpected error occurred. Please try again later.');
     } finally {
       loading.value = false;
     }
   }
 };
+
 
 const continueWithoutAccount = () => {
   router.push('/');

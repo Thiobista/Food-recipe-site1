@@ -13,4 +13,5 @@ require (
 	github.com/gorilla/handlers v1.5.2 // indirect
 	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/crypto v0.29.0 // indirect
 )

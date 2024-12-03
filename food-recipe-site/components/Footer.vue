@@ -59,7 +59,7 @@
         <p class="mb-4 md:mb-0">&copy; 2024 RecipeSite. All rights reserved.</p>
         <p>
           Designed with ❤️ by
-          <router-link to="/about" class="hover:text-yellow-400 transition-colors font-semibold">Thiobista</router-link>
+          <router-link to="/" class="hover:text-yellow-400 transition-colors font-semibold">Thiobista</router-link>
         </p>
       </div>
     </div>

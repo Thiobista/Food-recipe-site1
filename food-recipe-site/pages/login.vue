@@ -1,7 +1,7 @@
 <template>
     <div class="relative min-h-screen bg-cover bg-center flex items-center justify-center">
       <Header />
-      <!-- Blurred Background Layer -->
+      <!-- Blurred Backghround Layer -->
       <div 
         class="absolute inset-0 bg-cover bg-center blur-sm" 
         style="background-image: url('images/chief.jpg');"
@@ -64,7 +64,7 @@
                 type="submit"
                 class="w-full bg-teal-500 text-white py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out hover:bg-teal-600 disabled:opacity-50"
               >
-                {{ loading ? 'Creating Account...' : 'Login' }}
+                {{ loading ? 'login to your Account...' : 'Login' }}
               </button>
             </div>
           </div>
@@ -105,51 +105,39 @@
   const errors = ref({});
   const loading = ref(false);
   
-  const submitForm = async () => {
-    errors.value = {};
-    if (!fullName.value) errors.value.fullName = 'Full name is required';
-    if (!email.value) errors.value.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email.value)) errors.value.email = 'Email is invalid';
-    if (!password.value) errors.value.password = 'Password is required';
   
-    if (Object.keys(errors.value).length === 0) {
-      try {
-        loading.value = true;
-        const response = await axios.post(
-          'http://localhost:8080/v1/graphql',
-          {
-            query: `
-              mutation Signup($username: String!, $email: String!, $password: String!) {
-                insert_users_one(object: {username: $username, email: $email, password: $password}) {
-                  id
-                }
-              }
-            `,
-            variables: {
-              username: fullName.value,
-              email: email.value,
-              password: password.value,
-            },
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Hasura-Admin-Secret': 'myadminsecretkey',
-            },
-          }
-        );
-        router.push('/authorized');
-      } catch (error) {
-        if (error.response) {
-          alert('Error: ' + (error.response.data.message || 'Registration failed'));
-        } else {
-          alert('An unexpected error occurred. Please try again later.');
-        }
-      } finally {
-        loading.value = false;
+  const submitForm = async () => {
+  errors.value = {};
+  if (!email.value) errors.value.email = "Email is required";
+  if (!password.value) errors.value.password = "Password is required";
+
+  if (Object.keys(errors.value).length === 0) {
+    try {
+      loading.value = true;
+
+      const response = await axios.post("http://localhost:8081/login", {
+        email: email.value,
+        password: password.value,
+      });
+
+      if (response.status === 200) {
+        // Navigate to the authorized page
+        alert("Login successful!");
+        router.push("/authorized");
       }
+    } catch (error) {
+      // Show error alert
+      if (error.response && error.response.status === 401) {
+        alert("Invalid email or password.");
+      } else {
+        alert("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      loading.value = false;
     }
-  };
+  }
+};
+
   
   const continueWithoutAccount = () => {
     router.push('/');
@@ -158,5 +146,30 @@
   const goToLogin = () => {
     router.push('/login'); // Navigate to the login page
   };
+  const login = async () => {
+  errors.value = {};
+  if (!email.value) errors.value.email = "Email is required";
+  if (!password.value) errors.value.password = "Password is required";
+
+  if (Object.keys(errors.value).length === 0) {
+    try {
+      loading.value = true;
+      const response = await axios.post("http://localhost:8081/login", {
+        email: email.value,
+        password: password.value,
+      });
+
+      // Handle success
+      alert(response.data.message);
+      // Store the user ID if needed (e.g., in localStorage)
+    } catch (error) {
+      // Handle errors
+      alert(error.response.data || "Login failed");
+    } finally {
+      loading.value = false;
+    }
+  }
+};
+
   </script>
   
