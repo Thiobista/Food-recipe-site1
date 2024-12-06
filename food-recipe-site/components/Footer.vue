@@ -1,12 +1,12 @@
 <template>
-  <footer class="bg-gray-900 text-white py-10">
+  <footer class="bg-white-900 text-white py-10">
     <div class="container mx-auto px-6 lg:px-20">
       <!-- Top Section -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
         <!-- About Us -->
         <div>
           <h2 class="text-xl font-bold text-yellow-500 mb-4">About Us</h2>
-          <p class="text-sm text-gray-400 leading-relaxed">
+          <p class="text-sm text-white leading-relaxed">
             RecipeSite is your go-to platform for discovering, creating, and sharing amazing recipes. Join our community and ignite your culinary passion!
           </p>
         </div>
