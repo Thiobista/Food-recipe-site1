@@ -1,196 +1,229 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 py-12 px-4">
-      <!-- Header Section -->
-      <div class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
-      <Header />
-    </div>
-          <!-- Content Section -->
-    <div class="pt-20 px-4"> <!-- Added padding to push content below the fixed header -->
-    </div>
-    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-4xl font-bold text-gray-800 text-center mb-8">Create a New Recipe</h1>
+  <div class="max-w-2xl mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Create a New Recipe</h1>
 
-      <form @submit.prevent="submitRecipe" class="space-y-6">
-        <!-- Recipe Title -->
-        <div>
-          <label for="recipe-title" class="block text-lg font-medium text-gray-700">Recipe Title</label>
+    <form @submit.prevent="submitRecipe">
+      <div class="mb-4">
+        <label for="title" class="block font-medium mb-2">Recipe Title</label>
+        <input
+          id="title"
+          v-model="form.title"
+          type="text"
+          placeholder="Enter recipe title"
+          class="border border-gray-300 rounded-md p-2 w-full"
+          required
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="block font-medium mb-2">Description</label>
+        <textarea
+          id="description"
+          v-model="form.description"
+          placeholder="Enter recipe description"
+          class="border border-gray-300 rounded-md p-2 w-full"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label for="time" class="block font-medium mb-2">Time to Prepare (minutes)</label>
+        <input
+          id="time"
+          v-model.number="form.time_to_prepare"
+          type="number"
+          min="1"
+          placeholder="Enter time in minutes"
+          class="border border-gray-300 rounded-md p-2 w-full"
+          required
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="image" class="block font-medium mb-2">Featured Image</label>
+        <input
+          id="image"
+          type="file"
+          @change="handleImageUpload"
+          class="border border-gray-300 rounded-md p-2 w-full"
+          accept="image/*"
+        />
+        <div v-if="form.featured_image_url" class="mt-2">
+          <img :src="form.featured_image_url" alt="Preview" class="max-h-40" />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="category" class="block font-medium mb-2">Category</label>
+        <select
+          id="category"
+          v-model="form.category_id"
+          class="border border-gray-300 rounded-md p-2 w-full"
+          required
+        >
+          <option value="" disabled>Select a category</option>
+          <option v-for="category in categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label for="steps" class="block font-medium mb-2">Steps</label>
+        <div v-for="(step, index) in form.steps" :key="index" class="flex items-center mb-2">
           <input
-            v-model="recipe.title"
+            v-model="form.steps[index].step_description"
             type="text"
-            id="recipe-title"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            placeholder="Enter the recipe title"
+            placeholder="Enter step description"
+            class="border border-gray-300 rounded-md p-2 flex-1"
             required
           />
-        </div>
-
-        <!-- Recipe Description -->
-        <div>
-          <label for="recipe-description" class="block text-lg font-medium text-gray-700">Description</label>
-          <textarea
-            v-model="recipe.description"
-            id="recipe-description"
-            rows="4"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            placeholder="Enter a brief description of the recipe"
-            required
-          ></textarea>
-        </div>
-
-        <!-- Ingredients -->
-        <div>
-          <label for="recipe-ingredients" class="block text-lg font-medium text-gray-700">Ingredients</label>
-          <textarea
-            v-model="recipe.ingredients"
-            id="recipe-ingredients"
-            rows="4"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            placeholder="Enter the ingredients"
-            required
-          ></textarea>
-        </div>
-
-        <!-- Steps -->
-        <div>
-          <label for="recipe-steps" class="block text-lg font-medium text-gray-700">Steps</label>
-          <textarea
-            v-model="recipe.steps"
-            id="recipe-steps"
-            rows="6"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            placeholder="Enter the cooking steps"
-            required
-          ></textarea>
-        </div>
-
-        <!-- Time to Prepare -->
-        <div>
-          <label for="recipe-time" class="block text-lg font-medium text-gray-700">Time to Prepare</label>
-          <input
-            v-model="recipe.time"
-            type="text"
-            id="recipe-time"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            placeholder="Enter the preparation time (e.g., 30 minutes)"
-            required
-          />
-        </div>
-
-        <!-- Food Category -->
-        <div>
-          <label for="recipe-category" class="block text-lg font-medium text-gray-700">Food Category</label>
-          <select
-            v-model="recipe.category"
-            id="recipe-category"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-            required
-          >
-            <option value="">Select a category</option>
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-            <option value="Snack">Snack</option>
-            <option value="Dessert">Dessert</option>
-          </select>
-        </div>
-
-        <!-- Image Upload -->
-        <div>
-          <label for="recipe-image" class="block text-lg font-medium text-gray-700">Recipe Image</label>
-          <input
-            type="file"
-            id="recipe-image"
-            @change="handleImageUpload"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-yellow-400 focus:border-yellow-400"
-          />
-        </div>
-
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button
-            type="submit"
-            class="bg-yellow-500 text-white px-8 py-3 rounded-lg shadow-md hover:bg-yellow-600 transform hover:scale-105 transition duration-300"
-          >
-            Submit Recipe
+          <button type="button" @click="removeStep(index)" class="ml-2 text-red-500">
+            Remove
           </button>
         </div>
-      </form>
-    </div>
-  </div>
+        <button type="button" @click="addStep" class="text-blue-500">
+          + Add Step
+        </button>
+      </div>
 
+      <div class="mb-4">
+        <label for="ingredients" class="block font-medium mb-2">Ingredients</label>
+        <div v-for="(ingredient, index) in form.ingredients" :key="index" class="flex items-center mb-2">
+          <input
+            v-model="form.ingredients[index].ingredient_name"
+            type="text"
+            placeholder="Enter ingredient"
+            class="border border-gray-300 rounded-md p-2 flex-1"
+            required
+          />
+          <button type="button" @click="removeIngredient(index)" class="ml-2 text-red-500">
+            Remove
+          </button>
+        </div>
+        <button type="button" @click="addIngredient" class="text-blue-500">
+          + Add Ingredient
+        </button>
+      </div>
+
+      <button
+        type="submit"
+        class="bg-blue-500 text-white font-medium rounded-md p-2 w-full"
+      >
+        Submit Recipe
+      </button>
+    </form>
+  </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+<script>
+import gql from "graphql-tag";
+import { useMutation } from "@vue/apollo-composable";
 
-const recipe = ref({
-    title: '',
-    description: '',
-    ingredients: '',
-    steps: '',
-    time: '',
-    category: '',
-    image: null,
-});
+const CREATE_RECIPE = gql`
+  mutation CreateFullRecipe($input: recipes_insert_input!) {
+    insert_recipes_one(object: $input) {
+      id
+      steps {
+        step_number
+        step_description
+      }
+      ingredients {
+        ingredient_name
+        quantity
+      }
+    }
+  }
+`;
 
-const router = useRouter();
-
-const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
+export default {
+  data() {
+    return {
+      form: {
+        title: "",
+        description: "",
+        time_to_prepare: null,
+        featured_image_url: "",
+        category_id: "",
+        steps: [{ step_number: 1, step_description: "" }],
+        ingredients: [{ ingredient_name: "", quantity: "" }],
+      },
+      categories: [
+        { id: "1", name: "Breakfast" },
+        { id: "2", name: "Lunch" },
+        { id: "3", name: "Dinner" },
+      ],
+    };
+  },
+  setup() {
+    const { mutate: createRecipe } = useMutation(CREATE_RECIPE);
+    return { createRecipe };
+  },
+  methods: {
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            recipe.value.image = e.target.result; // Save the base64 image
+          this.form.featured_image_url = e.target.result;
         };
         reader.readAsDataURL(file);
+      }
+    },
+    addStep() {
+      const nextStep = this.form.steps.length + 1;
+      this.form.steps.push({ step_number: nextStep, step_description: "" });
+    },
+    removeStep(index) {
+      this.form.steps.splice(index, 1);
+    },
+    addIngredient() {
+      this.form.ingredients.push({ ingredient_name: "", quantity: "" });
+    },
+    removeIngredient(index) {
+      this.form.ingredients.splice(index, 1);
+    },
+    async submitRecipe() {
+  const token = localStorage.getItem("token"); // Retrieve stored token
+  if (!token) {
+    alert("Authorization token not found");
+    return;
+  }
+
+  // Prepare recipe data
+  const recipeData = {
+    title: this.form.title,
+    description: this.form.description,
+    time_to_prepare: this.form.time_to_prepare,
+    featured_image_url: this.form.featured_image_url,
+    category_id: this.form.category_id,
+    user_id: "a55fe52d-6484-4482-824f-66f6fb659d30", // Use the actual user ID here
+    steps: this.form.steps,
+    ingredients: this.form.ingredients,
+  };
+
+  try {
+      const response = await axios.post('http://localhost:8081/api/recipes', this.form, {
+        headers: {
+          'Authorization': `Bearer ${this.token}` // Pass the JWT token
+        }
+      });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log("Recipe submitted successfully:", result);
+      alert("Recipe submitted successfully!");
+    } else {
+      throw new Error(result.message || "Something went wrong.");
     }
+  } catch (error) {
+    console.error("Error creating recipe:", error);
+    alert(`Error: ${error.message}`);
+  }
+}
+
+
+  },
 };
-
-const submitRecipe = async () => {
-    try {
-        // Make the POST request
-        const response = await axios.post('http://localhost:8081/create-recipe', {
-            title: recipe.value.title,
-            description: recipe.value.description,
-            ingredients: recipe.value.ingredients,
-            steps: recipe.value.steps,
-            time: recipe.value.time,
-            category: recipe.value.category,
-            image: recipe.value.image,
-            userId: 'exampleUserId123', // Replace with the actual logged-in user's ID
-        });
-
-        // Redirect or show success message
-        console.log(response.data.message);
-        router.push('/my-recipes'); // Navigate to the homepage or another page
-    } catch (error) {
-        console.error('Error submitting recipe:', error.response?.data || error.message);
-        alert('Failed to submit the recipe. Please try again.');
-    }
-};
-
 </script>
-
-
-
-<style scoped>
-body {
-  font-family: 'Inter', sans-serif;
-}
-
-form input:focus,
-form textarea:focus,
-form select:focus {
-  outline: none;
-}
-
-form {
-  transition: transform 0.3s ease-in-out;
-}
-
-form:hover {
-  transform: scale(1.02);
-}
-</style>

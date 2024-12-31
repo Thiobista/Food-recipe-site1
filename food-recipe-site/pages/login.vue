@@ -96,6 +96,8 @@ const submitForm = async () => {
       });
 
       if (response.status === 200) {
+        const token = response.data.token; // Assuming the token is in response.data.token
+        localStorage.setItem("token", token); // Store the token in localStorage
         toast.success(response.data.message || "Login successful!");
         router.push("/authorized");
       }

@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   vite: {
     server: {
+      fs: {
+        strict: false,
+      },
       hmr: {
         protocol: 'ws', // Use 'wss' if using HTTPS
         host: 'localhost',
@@ -43,6 +46,7 @@ export default defineNuxtConfig({
     public: {
       apiUrl: process.env.API_URL || 'http://localhost:3000',
       graphqlEndpoint: "http://localhost:8080/v1/graphql", // Hasura GraphQL endpoint
+      // apiBase: process.env.API_BASE_URL || 'http://localhost:8081/api',
     },
   },
   plugins: [
